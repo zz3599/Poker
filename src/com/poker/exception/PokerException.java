@@ -1,11 +1,15 @@
 package com.poker.exception;
 
 public class PokerException extends Exception {
-	public PokerException(){
-		
+	ErrorCode err;
+	
+	public PokerException(ErrorCode err){
+		this.err = err;
 	}
 	
-	public PokerException(String msg){
+	public PokerException(String msg, ErrorCode err){
+		
 		super(msg);
+		this.err = err;
 	}
 }

@@ -1,5 +1,7 @@
 package com.engine.state;
 
+import com.engine.state.context.ActionContext;
+
 public enum GameState {
 	START, //animation
 	MENU, //choose a table
@@ -15,13 +17,12 @@ public enum GameState {
 	 * The existence of such a context inside the GameState correlates to different intermediate states
 	 */
 	ActionContext actionContext;
-	
+		
 	public void setActionContext(ActionContext context) {
 		this.actionContext = context;
 	}
 	
-	public void nullActionContext() {
-		this.actionContext = null;
-	}
-	
+	public ActionContext getActionContext(){
+		return this.actionContext;
+	}	
 }

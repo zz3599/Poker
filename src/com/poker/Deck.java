@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
+import com.poker.exception.ErrorCode;
 import com.poker.exception.PokerException;
 
 /**
@@ -47,7 +48,7 @@ public class Deck {
 		int i = 0;
 		for(Player player : players){
 			if (this.dealtCards[i] || this.dealtCards[i + offset]){
-				throw new PokerException("Cards for player " + player.name + " are already dealt at " + i + ", " + (i + offset));
+				throw new PokerException("Cards for player " + player.name + " are already dealt at " + i + ", " + (i + offset), ErrorCode.DECK_EMPTY);
 			}
 			Hand hand = new Hand(this.cards[i], this.cards[i + offset]);
 			player.dealHand(hand);
@@ -63,7 +64,7 @@ public class Deck {
 			idx++;
 		}
 		if (idx >= dealtCards.length){
-			throw new PokerException("Empty deck cannot be dealt");
+			throw new PokerException("Empty deck cannot be dealt", ErrorCode.DECK_EMPTY);
 		}
 		this.dealtCards[idx] = true;
 		return this.cards[idx];
