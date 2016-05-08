@@ -13,7 +13,7 @@ public class Main {
 			System.out.println("Game " + i);
 			game.deal();
 			//TODO: game.gameloop
-			game.cleanup();
+			game.endRound();;
 		}
 		
 	}

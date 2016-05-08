@@ -3,8 +3,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
+import com.poker.exception.PokerException;
+
+/**
+ * Keeps track of a deck of cards, and which cards have been dealt.
+ * This should not manage the state of your game (community cards, etc.) 
+ */
 public class Deck {
 	public static final Integer DEFAULT_DECK_SIZE = 52;
+	/** 0 represents the top of the deck */
 	public Card[] cards;
 	/** Exclude these card indices when doing any probabilities, etc. */
 	public boolean[] dealtCards;
@@ -35,12 +42,12 @@ public class Deck {
 		}
 	}
 	
-	public void deal(Collection<Player> players) {
+	public void deal(Collection<Player> players) throws PokerException {
 		int offset = players.size();
 		int i = 0;
 		for(Player player : players){
 			if (this.dealtCards[i] || this.dealtCards[i + offset]){
-				throw new RuntimeException("Cards for player " + player.name + " are already dealt at " + i + ", " + (i + offset));
+				throw new PokerException("Cards for player " + player.name + " are already dealt at " + i + ", " + (i + offset));
 			}
 			Hand hand = new Hand(this.cards[i], this.cards[i + offset]);
 			player.dealHand(hand);
@@ -48,6 +55,18 @@ public class Deck {
 			this.dealtCards[i + offset] = true;
 			i++;
 		}
+	}
+	
+	public Card dealOne() throws PokerException{
+		int idx = 0;
+		while(this.dealtCards[idx]){
+			idx++;
+		}
+		if (idx >= dealtCards.length){
+			throw new PokerException("Empty deck cannot be dealt");
+		}
+		this.dealtCards[idx] = true;
+		return this.cards[idx];
 	}
 	
 	public void reset(){

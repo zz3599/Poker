@@ -10,8 +10,10 @@ public enum GameState {
 	RIVER, 
 	ENDROUND; //end round of poker
 	
-	// Rather than have a betting state, this actionContext can indicate intermediate states like betting state
-	// The existence of such a context inside the GameState correlates to different intermediate states
+	/** 
+	 * Rather than have a betting state, this actionContext can indicate intermediate states like betting state.
+	 * The existence of such a context inside the GameState correlates to different intermediate states
+	 */
 	ActionContext actionContext;
 	
 	public void setActionContext(ActionContext context) {
