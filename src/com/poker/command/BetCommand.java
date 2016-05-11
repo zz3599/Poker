@@ -14,8 +14,7 @@ public class BetCommand implements PokerCommand {
 
 	@Override
 	public boolean isLegal(GameState gameState) {
-		return (gameState.getActionContext().contextName.equals(BettingContext.NAME)
-				&& gameState.getActionContext().player.equals(this.player));
+		return gameState.name().contains("BET");
 	}
 
 	@Override

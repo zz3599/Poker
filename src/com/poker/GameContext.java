@@ -13,6 +13,8 @@ public class GameContext {
 
 	public final List<Card> communityCards;
 	
+	public int potSize;
+	
 	public final Deck deck;
 	/** Seat index -> player */
 	public final Map<Integer, Player> playerMap;
@@ -24,6 +26,7 @@ public class GameContext {
 		this.communityCards = new ArrayList<Card>();
 		this.occupiedSeats = new boolean[DEFAULT_GAME_SIZE];
 		this.playerMap = new LinkedHashMap<Integer, Player>();
+		this.potSize = 0;
 		this.initialize();
 	}
 
@@ -37,6 +40,8 @@ public class GameContext {
 		}
 		this.deck.reset();
 		this.communityCards.clear();
+		this.potSize = 0;
+		//TODO: give the money to somebody
 	}
 
 	public void deal() {
