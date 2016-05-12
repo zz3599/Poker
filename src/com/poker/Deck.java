@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.poker.exception.ErrorCode;
 import com.poker.exception.PokerException;
+import com.poker.hand.Hand;
 
 /**
  * Keeps track of a deck of cards, and which cards have been dealt.

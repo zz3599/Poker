@@ -2,6 +2,7 @@ package com.poker;
 
 import com.poker.exception.ErrorCode;
 import com.poker.exception.PokerException;
+import com.poker.hand.Hand;
 
 public class Player {
 	public static final int DEFAULT_MONEY = 1000;
@@ -50,7 +51,8 @@ public class Player {
 
 	@Override
 	public int hashCode() {
-		return name.hashCode();
+		// ensures that if x.equals(y), x.hashcode == y.hashcode
+		return name.toLowerCase().hashCode();
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class Player {
 		if (other == this) {
 			return true;
 		}
-		return ((Player) other).equals(this);
+		return ((Player) other).name.equalsIgnoreCase(this.name);
 	}
 
 }

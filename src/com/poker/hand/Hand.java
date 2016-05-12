@@ -1,6 +1,8 @@
-package com.poker;
+package com.poker.hand;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.poker.Card;
 
 public class Hand {
 	public static final Integer POKER_HAND_SIZE = 2;
@@ -17,6 +19,11 @@ public class Hand {
 		for(Card card : cards){
 			this.cards.add(card);			
 		}		
+	}
+	
+	public Hand(List<Card> cards){
+		this(cards.size());
+		this.cards.addAll(cards);
 	}
 	
 	public String toString(){
