@@ -1,8 +1,8 @@
 package com.poker;
 
 public class Card implements Comparable<Card> {
-	/** Value 0 has no printable value */
-	public static String[] VALUE_STRINGS = { null, "2", "3", "4", "5", "6",
+	/** Value 0/1 has no printable value */
+	public static String[] VALUE_STRINGS = { null, null, "2", "3", "4", "5", "6",
 			"7", "8", "9", "10", "J", "Q", "K", "A" };
 
 	public enum Suite {
@@ -20,8 +20,9 @@ public class Card implements Comparable<Card> {
 		}
 	}
 
-	public static Integer MIN_VALUE = 1;
-	public static Integer MAX_VALUE = 13;
+	//Start from 2, Ace = 14
+	public static Integer MIN_VALUE = 2;
+	public static Integer MAX_VALUE = 14;
 
 	public Suite suite;
 	public int value;

@@ -13,6 +13,7 @@ import com.poker.hand.Hand;
  */
 public class Deck {
 	public static final Integer DEFAULT_DECK_SIZE = 52;
+	public static final Integer  DEFAULT_SUITE_SIZE = DEFAULT_DECK_SIZE / 4;
 	/** 0 represents the top of the deck */
 	public Card[] cards;
 	/** Exclude these card indices when doing any probabilities, etc. */
@@ -26,9 +27,8 @@ public class Deck {
 		this.cards = new Card[DEFAULT_DECK_SIZE];
 		this.dealtCards = new boolean[DEFAULT_DECK_SIZE];
 		
-		
-		for(int i = 0; i < cards.length; i++) {
-			cards[i] = new Card(Card.Suite.getSuite(i / Card.MAX_VALUE), i % Card.MAX_VALUE + 1);
+		for(int i = 0; i < DEFAULT_DECK_SIZE; i++) {
+			cards[i] = new Card(Card.Suite.getSuite(i / DEFAULT_SUITE_SIZE), i % DEFAULT_SUITE_SIZE);
 		}
 		
 		this.shuffle();
