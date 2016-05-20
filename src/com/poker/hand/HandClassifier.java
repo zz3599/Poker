@@ -29,6 +29,7 @@ public class HandClassifier {
 	private void beforeCall() {
 		Arrays.fill(this.seenValues, 0);
 		Arrays.fill(this.seenSuites, 0);
+		this.filtervalues.clear();
 	}
 
 	/**
@@ -60,16 +61,27 @@ public class HandClassifier {
 		return combos;
 	}
 
-	public HandClassification getHandClassifications(List<Card> communityCards, Hand hand) {
+	public HandClassification getHandClassification(List<Card> communityCards,
+			Hand hand) {
 		List<Card> handCards = new ArrayList<Card>(hand.getCards());
 		handCards.addAll(communityCards);
-		List<List<Card>> allFiveCardCombinations = HandClassifier.combinations(handCards, DEFAULT_POKER_HAND_SIZE);
+		List<List<Card>> allFiveCardCombinations = HandClassifier.combinations(
+				handCards, DEFAULT_POKER_HAND_SIZE);
 		List<HandClassification> classifications = new ArrayList<HandClassification>();
 		for (List<Card> combo : allFiveCardCombinations) {
 			HandClassification classification = getHandRank(combo);
-			System.out.println(classification.getRank() + ":"
-					+ Arrays.deepToString(ListUtils.removeAll(handCards, classification.getCardValues()).toArray()));
-			classification.setCardKickers(ListUtils.removeAll(handCards, classification.getCardValues()));
+			classification.setCardKickers(ListUtils.removeAll(handCards,
+					classification.getCardValues()));
+
+			System.out.println(classification.getHandRank()
+					+ ", handRank: "
+					+ Long.toHexString(classification.getCardRank())					
+					+ Arrays.deepToString(classification.getCardValues().toArray())
+					
+					+ ", kickerRank: "
+					+ Long.toHexString(classification.getKickerRank())
+					+ Arrays.deepToString(ListUtils.removeAll(handCards,
+							classification.getCardValues()).toArray()));
 			classifications.add(classification);
 		}
 		Collections.sort(classifications);
@@ -95,10 +107,12 @@ public class HandClassifier {
 			return new HandClassification(HandRank.STRAIGHT_FLUSH, cards);
 		}
 		if (this.isFourOfAKind(cards)) {
-			return new HandClassification(HandRank.FOUR_KIND, this.getCardsMatchingValues(this.filtervalues, cards));
+			return new HandClassification(HandRank.FOUR_KIND,
+					this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isFullHouse(cards)) {
-			return new HandClassification(HandRank.FULL_HOUSE, this.getCardsMatchingValues(this.filtervalues, cards));
+			return new HandClassification(HandRank.FULL_HOUSE,
+					this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isFlush(cards)) {
 			return new HandClassification(HandRank.FLUSH, cards);
@@ -107,18 +121,22 @@ public class HandClassifier {
 			return new HandClassification(HandRank.STRAIGHT, cards);
 		}
 		if (this.isThreeOfAKind(cards)) {
-			return new HandClassification(HandRank.THREE_KIND, this.getCardsMatchingValues(this.filtervalues, cards));
+			return new HandClassification(HandRank.THREE_KIND,
+					this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isTwoPair(cards)) {
-			return new HandClassification(HandRank.TWO_PAIR, this.getCardsMatchingValues(this.filtervalues, cards));
+			return new HandClassification(HandRank.TWO_PAIR,
+					this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isPair(cards)) {
-			return new HandClassification(HandRank.PAIR, this.getCardsMatchingValues(this.filtervalues, cards));
+			return new HandClassification(HandRank.PAIR,
+					this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		return new HandClassification(HandRank.HIGH_CARD);
 	}
 
-	public List<Card> getCardsMatchingValues(Set<Integer> cardValues, List<Card> cards) {
+	public List<Card> getCardsMatchingValues(Set<Integer> cardValues,
+			List<Card> cards) {
 		List<Card> result = new ArrayList<Card>();
 		for (Card card : cards) {
 			if (cardValues.contains(card.value)) {
@@ -134,8 +152,9 @@ public class HandClassifier {
 			return false;
 		}
 		for (int i = 0; i < this.seenValues.length - 4; i++) {
-			if (this.seenValues[i] > 0 && this.seenValues[i + 1] > 0 && this.seenValues[i + 2] > 0
-					&& this.seenValues[i + 3] > 0 && this.seenValues[i + 4] > 0) {
+			if (this.seenValues[i] > 0 && this.seenValues[i + 1] > 0
+					&& this.seenValues[i + 2] > 0 && this.seenValues[i + 3] > 0
+					&& this.seenValues[i + 4] > 0) {
 				return true;
 			}
 		}

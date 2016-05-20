@@ -29,6 +29,7 @@ public class Card implements Comparable<Card> {
 	public Player owner;
 
 	public Card(Suite suite, int value) {
+		assert value <= MAX_VALUE;
 		this.suite = suite;
 		this.value = value;
 	}

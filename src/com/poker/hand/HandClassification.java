@@ -26,11 +26,11 @@ public class HandClassification implements Comparable<HandClassification> {
 		this.cardValues = cardValues;
 	}
 
-	public HandRank getRank() {
+	public HandRank getHandRank() {
 		return rank;
 	}
 
-	public void setRank(HandRank rank) {
+	public void setHandRank(HandRank rank) {
 		this.rank = rank;
 	}
 	
@@ -68,16 +68,17 @@ public class HandClassification implements Comparable<HandClassification> {
 		return kickerValue;
 	}
 	@Override
-	public int compareTo(HandClassification o) {
-		assert this.cardValues.size() == o.cardValues.size();
+	public int compareTo(HandClassification o) {		
 		if (this.rank.compareTo(o.rank) == 0){
+			assert this.cardValues.size() == o.cardValues.size();
+			// 5 card hands are equivalent regardless
 			if (this.cardValues.size() == 5){
 				return 0;
 			}
 			if (this.getCardRank().compareTo(o.getCardRank()) == 0){
 				return this.getKickerRank().compareTo(o.getKickerRank());
 			}
-			return this.getCardRank().compareTo(o.getKickerRank());					
+			return this.getCardRank().compareTo(o.getCardRank());					
 		}
 		return this.rank.compareTo(o.rank);
 	}
