@@ -3,10 +3,11 @@ package com.poker.hand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
+import com.engine.utils.ListUtils;
 import com.poker.Card;
 
 public class HandClassifier {
@@ -15,8 +16,11 @@ public class HandClassifier {
 													// at 1, goes up to 13
 	int[] seenSuites = new int[Card.Suite.values().length];
 
-	Map<Integer, List<Card>> cardMaps = new HashMap<Integer, List<Card>>();
-	Card highCard;
+	/**
+	 * In cases of 4-kind, 3-kind, 2-pair, 1-pair, it keeps track of the values
+	 * to track as card values
+	 */
+	Set<Integer> filtervalues = new HashSet<Integer>();
 
 	public HandClassifier() {
 
@@ -25,10 +29,18 @@ public class HandClassifier {
 	private void beforeCall() {
 		Arrays.fill(this.seenValues, 0);
 		Arrays.fill(this.seenSuites, 0);
-		cardMaps.clear();
 	}
 
-	// (n choose k) = (n-1 choose k-1) + (n-1 choose k)
+	/**
+	 * Returns a list of k-card combinations from the list of cards. It uses the
+	 * recursive equation (n choose k) = (n-1 choose k-1) + (n-1 choose k)
+	 * 
+	 * @param cards
+	 *            The list of cards to get combinations from
+	 * @param k
+	 *            The size of the combinations
+	 * @return
+	 */
 	public static List<List<Card>> combinations(List<Card> cards, int k) {
 		int n = cards.size();
 		List<List<Card>> combos = new ArrayList<List<Card>>();
@@ -49,12 +61,19 @@ public class HandClassifier {
 	}
 
 	public HandClassification getHandClassifications(List<Card> communityCards, Hand hand) {
-		HandClassification handClassification = null;
-		List<Card> handCards = new ArrayList<Card>(hand.cards);
-		List<List<Card>> fiveCards = HandClassifier.combinations(handCards, DEFAULT_POKER_HAND_SIZE);
+		List<Card> handCards = new ArrayList<Card>(hand.getCards());
 		handCards.addAll(communityCards);
-		Collections.sort(handCards);
-		return handClassification;
+		List<List<Card>> allFiveCardCombinations = HandClassifier.combinations(handCards, DEFAULT_POKER_HAND_SIZE);
+		List<HandClassification> classifications = new ArrayList<HandClassification>();
+		for (List<Card> combo : allFiveCardCombinations) {
+			HandClassification classification = getHandRank(combo);
+			System.out.println(classification.getRank() + ":"
+					+ Arrays.deepToString(ListUtils.removeAll(handCards, classification.getCardValues()).toArray()));
+			classification.setCardKickers(ListUtils.removeAll(handCards, classification.getCardValues()));
+			classifications.add(classification);
+		}
+		Collections.sort(classifications);
+		return classifications.get(classifications.size() - 1);
 	}
 
 	/**
@@ -66,43 +85,53 @@ public class HandClassifier {
 	 * @param cards
 	 * @return
 	 */
-	private HandRank getHandRank(List<Card> cards) {
-		// TODO: how to get the high card to figure out tiebreaker in case same
-		// HandRank?
+	private HandClassification getHandRank(List<Card> cards) {
+		this.beforeCall();
+		for (Card card : cards) {
+			this.seenValues[card.value]++;
+			this.seenSuites[card.suite.ordinal()]++;
+		}
 		if (this.isStraightFlush(cards)) {
-			return HandRank.STRAIGHT_FLUSH;
+			return new HandClassification(HandRank.STRAIGHT_FLUSH, cards);
 		}
 		if (this.isFourOfAKind(cards)) {
-			return HandRank.FOUR_KIND;
+			return new HandClassification(HandRank.FOUR_KIND, this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isFullHouse(cards)) {
-			return HandRank.FULL_HOUSE;
+			return new HandClassification(HandRank.FULL_HOUSE, this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isFlush(cards)) {
-			return HandRank.FLUSH;
+			return new HandClassification(HandRank.FLUSH, cards);
 		}
 		if (this.isStraight(cards)) {
-			return HandRank.STRAIGHT;
+			return new HandClassification(HandRank.STRAIGHT, cards);
 		}
 		if (this.isThreeOfAKind(cards)) {
-			return HandRank.THREE_KIND;
+			return new HandClassification(HandRank.THREE_KIND, this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isTwoPair(cards)) {
-			return HandRank.TWO_PAIR;
+			return new HandClassification(HandRank.TWO_PAIR, this.getCardsMatchingValues(this.filtervalues, cards));
 		}
 		if (this.isPair(cards)) {
-			return HandRank.PAIR;
+			return new HandClassification(HandRank.PAIR, this.getCardsMatchingValues(this.filtervalues, cards));
 		}
-		return HandRank.HIGH_CARD;
+		return new HandClassification(HandRank.HIGH_CARD);
+	}
+
+	public List<Card> getCardsMatchingValues(Set<Integer> cardValues, List<Card> cards) {
+		List<Card> result = new ArrayList<Card>();
+		for (Card card : cards) {
+			if (cardValues.contains(card.value)) {
+				result.add(card);
+			}
+		}
+		Collections.sort(result);
+		return result;
 	}
 
 	public final boolean isStraight(List<Card> cards) {
-		this.beforeCall();
-		if (cards.size() < 5){
+		if (cards.size() < 5) {
 			return false;
-		}
-		for (Card card : cards) {
-			this.seenValues[card.value]++;
 		}
 		for (int i = 0; i < this.seenValues.length - 4; i++) {
 			if (this.seenValues[i] > 0 && this.seenValues[i + 1] > 0 && this.seenValues[i + 2] > 0
@@ -118,12 +147,8 @@ public class HandClassifier {
 	}
 
 	public final boolean isFlush(List<Card> cards) {
-		this.beforeCall();
-		if (cards.size() < 5){
+		if (cards.size() < 5) {
 			return false;
-		}
-		for (Card card : cards) {
-			this.seenSuites[card.suite.ordinal()]++;
 		}
 		for (int i = 0; i < this.seenSuites.length; i++) {
 			if (this.seenSuites[i] == 5) {
@@ -138,19 +163,17 @@ public class HandClassifier {
 	}
 
 	public final boolean isFullHouse(List<Card> cards) {
-		this.beforeCall();
-		if (cards.size() < 5){
+		if (cards.size() < 5) {
 			return false;
 		}
 		boolean threeKind = false;
 		boolean twoKind = false;
-		for (Card card : cards) {
-			this.seenValues[card.value]++;
-		}
 		for (int i = 0; i < this.seenValues.length; i++) {
-			if (this.seenValues[i] >= 3) {
+			if (this.seenValues[i] == 3) {
+				this.filtervalues.add(i);
 				threeKind = true;
-			} else if (this.seenValues[i] >= 2) {
+			} else if (this.seenValues[i] == 2) {
+				this.filtervalues.add(i);
 				twoKind = true;
 			}
 		}
@@ -162,13 +185,10 @@ public class HandClassifier {
 	}
 
 	public final boolean isTwoPair(List<Card> cards) {
-		this.beforeCall();
-		for (Card card : cards) {
-			this.seenValues[card.value]++;
-		}
 		int pairs = 0;
 		for (int i = 0; i < this.seenValues.length; i++) {
 			if (this.seenValues[i] == 2) {
+				this.filtervalues.add(i);
 				pairs++;
 			}
 		}
@@ -180,12 +200,9 @@ public class HandClassifier {
 	}
 
 	private boolean isXOfAKind(List<Card> cards, int x) {
-		this.beforeCall();
-		for (Card card : cards) {
-			this.seenValues[card.value]++;
-		}
 		for (int i = 0; i < this.seenValues.length; i++) {
 			if (this.seenValues[i] == x) {
+				this.filtervalues.add(i);
 				return true;
 			}
 		}

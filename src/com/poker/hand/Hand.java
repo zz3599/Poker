@@ -5,9 +5,9 @@ import java.util.List;
 import com.poker.Card;
 
 public class Hand {
-	public static final Integer POKER_HAND_SIZE = 2;
-	public List<Card> cards;
-	public int handSize = POKER_HAND_SIZE;
+	public static final int POKER_HAND_SIZE = 2;
+	private List<Card> cards;
+	private int handSize = POKER_HAND_SIZE;
 	
 	public Hand(int size){
 		this.cards = new ArrayList<Card>();
@@ -24,8 +24,24 @@ public class Hand {
 	public Hand(List<Card> cards){
 		this(cards.size());
 		this.cards.addAll(cards);
-	}
+	}	
 	
+	public List<Card> getCards() {
+		return cards;
+	}
+
+	public void setCards(List<Card> cards) {
+		this.cards = cards;
+	}
+
+	public int getHandSize() {
+		return handSize;
+	}
+
+	public void setHandSize(int handSize) {
+		this.handSize = handSize;
+	}
+
 	public String toString(){
 		String result = "Hand: ";
 		for(Card card : this.cards){

@@ -60,8 +60,9 @@ public class Card implements Comparable<Card> {
 
 	@Override
 	public int compareTo(Card o) {
-		// Don't really care about the suite when making comparisons
+		if(this.value == o.value){
+			return this.suite.ordinal() - o.suite.ordinal();
+		}
 		return this.value - o.value;
-
 	}
 }
