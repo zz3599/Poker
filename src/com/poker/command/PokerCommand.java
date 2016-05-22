@@ -1,6 +1,6 @@
 package com.poker.command;
 
-import com.engine.state.GameState;
+import com.engine.state.PokerGameState;
 
 /**
  * Each player will have a list of all the commands to invoke. 
@@ -12,6 +12,6 @@ import com.engine.state.GameState;
  * @see <a href="http://stackoverflow.com/a/558437/638127">Command pattern usage example</a>
  */
 public interface PokerCommand {
-	public boolean isLegal(GameState gameState);
-	public void apply(GameState gameState);
+	public boolean isLegal(PokerGameState gameState);
+	public void apply(PokerGameState gameState);
 }
