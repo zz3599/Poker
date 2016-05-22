@@ -3,6 +3,7 @@ package com.engine.state;
 /**
  * Interface for states. This can be either for the game state (intro, gameplay) or the actual
  * gameplay states (controlling character, menu) or rendering
+ * TODO: entered/revealed and obscuring/exiting are awfully similar, remove one of each?
  */
 public interface IState {
 	public String getName();

@@ -1,8 +1,8 @@
 package com.poker.command;
 
-import com.engine.state.PokerGameState;
 import com.poker.Player;
 import com.poker.exception.PokerException;
+import com.poker.state.AbstractPokerGameState;
 
 public class BetCommand implements PokerCommand {
 	public Player player;
@@ -12,12 +12,12 @@ public class BetCommand implements PokerCommand {
 	}
 
 	@Override
-	public boolean isLegal(PokerGameState gameState) {
+	public boolean isLegal(AbstractPokerGameState gameState) {
 		return gameState.getName().contains("BET");
 	}
 
 	@Override
-	public void apply(PokerGameState gameState) {
+	public void apply(AbstractPokerGameState gameState) {
 		//TODO: This needs to be fixed. The bet amount should be stored somewhere else.
 		
 		try {

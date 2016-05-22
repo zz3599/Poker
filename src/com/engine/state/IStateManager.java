@@ -7,5 +7,5 @@ public interface IStateManager <STATE extends IState>{
 	
 	public STATE popState();
 	
-	public void advanceState(PokerGameState nextState) throws EngineException;
+	public void advanceState(STATE nextState) throws EngineException;
 }

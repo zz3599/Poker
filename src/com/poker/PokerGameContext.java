@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import com.poker.exception.PokerException;
 
-public class GameContext {
+public class PokerGameContext {
 	public static final Integer DEFAULT_GAME_SIZE = 10;
 
 	public final List<Card> communityCards;
@@ -21,7 +21,7 @@ public class GameContext {
 	/** Map to determine if the seats are occupied */
 	public final boolean[] occupiedSeats;
 
-	public GameContext() {
+	public PokerGameContext() {
 		this.deck = new Deck();
 		this.communityCards = new ArrayList<Card>();
 		this.occupiedSeats = new boolean[DEFAULT_GAME_SIZE];

@@ -6,17 +6,17 @@ import com.poker.hand.Hand;
 
 public class Player {
 	public static final int DEFAULT_MONEY = 1000;
-	private final GameContext context;
+	private final PokerGameContext context;
 	public String name;
 	public Hand hand;
 	public int money;
 	public int betAmount;
 
-	public Player(String name, GameContext context) {
+	public Player(String name, PokerGameContext context) {
 		this(name, context, DEFAULT_MONEY);
 	}
 
-	public Player(String name, GameContext context, int money) {
+	public Player(String name, PokerGameContext context, int money) {
 		this.name = name;
 		this.context = context;
 		this.money = money;
