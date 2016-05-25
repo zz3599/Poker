@@ -12,6 +12,9 @@ import com.engine.EngineException;
 import com.engine.state.IStateManager;
 import com.poker.state.AbstractPokerGameState;
 
+/**
+ * Refer to http://www.pokerlistings.com/poker-rules-texas-holdem
+ */
 public class PokerGameStateManager implements IStateManager<AbstractPokerGameState>{
 	private Map<AbstractPokerGameState, Set<AbstractPokerGameState>> stateTransitions;
 	/** Top of the stack is the currentstate */
