@@ -34,8 +34,8 @@ public class TestHandClassifier {
 		Assert.assertTrue(classification.getHandRank() == HandRank.STRAIGHT_FLUSH);
 		//111 1100
 		Assert.assertTrue(classification.getCardRank() == 0x7C); 
-		//1 1000 0000
-		Assert.assertTrue(classification.getKickerRank() == 0x180); 
+		//No kickers on 5-card hands
+		Assert.assertTrue(classification.getKickerRank() == 0x0); 
 	}
 	
 	@Test
@@ -70,8 +70,8 @@ public class TestHandClassifier {
 		Assert.assertTrue(classification.getHandRank() == HandRank.FULL_HOUSE);
 		// 1 1000
 		Assert.assertTrue(classification.getCardRank()  == 0x18); 
-		// 1 1000 0000
-		Assert.assertTrue(classification.getKickerRank() == 0x180); 		
+		// No kickers on 5-card hands
+		Assert.assertTrue(classification.getKickerRank() == 0x0); 		
 	}
 	
 	@Test
@@ -88,8 +88,8 @@ public class TestHandClassifier {
 		Assert.assertTrue(classification.getHandRank() == HandRank.FLUSH);
 		// 100 1000 1001 1000
 		Assert.assertTrue(classification.getCardRank()  == 0x4898); 
-		// 100 0100 0000 0000
-		Assert.assertTrue(classification.getKickerRank() == 0x4400); 	
+		// No kickers on 5-card hands
+		Assert.assertTrue(classification.getKickerRank() == 0x0); 	
 	}
 	
 	@Test
@@ -106,8 +106,8 @@ public class TestHandClassifier {
 		Assert.assertTrue(classification.getHandRank() == HandRank.STRAIGHT);
 		// 111 1100 0000 0000
 		Assert.assertTrue(classification.getCardRank()  == 0x7C00); 
-		// 100 0000 0000 0000
-		Assert.assertTrue(classification.getKickerRank() == 0x4000);
+		// No kickers on 5-card hands
+		Assert.assertTrue(classification.getKickerRank() == 0x0);
 	}
 	
 	@Test

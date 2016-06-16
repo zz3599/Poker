@@ -70,8 +70,12 @@ public class HandClassifier {
 		List<HandClassification> classifications = new ArrayList<HandClassification>();
 		for (List<Card> combo : allFiveCardCombinations) {
 			HandClassification classification = getHandRank(combo);
-			classification.setCardKickers(ListUtils.removeAll(handCards,
-					classification.getCardValues()));
+			// Keep only five cards to compare against. Anything more, ignored.
+			if (classification.getCardValues().size() < DEFAULT_POKER_HAND_SIZE)
+			{
+				classification.setCardKickers(ListUtils.removeAll(handCards,
+						classification.getCardValues()));
+			}
 
 			System.out.println(classification.getHandRank()
 					+ ", handRank: "
@@ -148,7 +152,7 @@ public class HandClassifier {
 	}
 
 	public final boolean isStraight(List<Card> cards) {
-		if (cards.size() < 5) {
+		if (cards.size() < DEFAULT_POKER_HAND_SIZE) {
 			return false;
 		}
 		for (int i = 0; i < this.seenValues.length - 4; i++) {
@@ -166,7 +170,7 @@ public class HandClassifier {
 	}
 
 	public final boolean isFlush(List<Card> cards) {
-		if (cards.size() < 5) {
+		if (cards.size() < DEFAULT_POKER_HAND_SIZE) {
 			return false;
 		}
 		for (int i = 0; i < this.seenSuites.length; i++) {
@@ -182,7 +186,7 @@ public class HandClassifier {
 	}
 
 	public final boolean isFullHouse(List<Card> cards) {
-		if (cards.size() < 5) {
+		if (cards.size() < DEFAULT_POKER_HAND_SIZE) {
 			return false;
 		}
 		boolean threeKind = false;

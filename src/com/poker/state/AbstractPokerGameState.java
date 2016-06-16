@@ -1,6 +1,7 @@
 package com.poker.state;
 
 import com.engine.state.IState;
+import com.poker.Card;
 import com.poker.PokerGameContext;
 
 public abstract class AbstractPokerGameState implements IState{
@@ -33,5 +34,17 @@ public abstract class AbstractPokerGameState implements IState{
 	@Override
 	public String getName(){
 		return this.state.name();
+	}
+	
+	@Override
+	public boolean equals(Object other){
+		if (!(other instanceof AbstractPokerGameState)) {
+			return false;
+		}
+		if (other == this) {
+			return true;
+		}
+		AbstractPokerGameState otherState = (AbstractPokerGameState) other;
+		return otherState.getName().equalsIgnoreCase(this.getName());
 	}
 }
