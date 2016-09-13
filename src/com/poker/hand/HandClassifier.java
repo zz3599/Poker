@@ -70,7 +70,8 @@ public class HandClassifier {
 		List<HandClassification> classifications = new ArrayList<HandClassification>();
 		for (List<Card> combo : allFiveCardCombinations) {
 			HandClassification classification = getHandRank(combo);
-			// Keep only five cards to compare against. Anything more, ignored.
+			// Keep at most five cards to compare against. If we have less than 5 cards in the card value (high card, 1/2 pair, trips, four of a kind) 
+			// then we need to include another few cards to get to 5.
 			if (classification.getCardValues().size() < DEFAULT_POKER_HAND_SIZE)
 			{
 				classification.setCardKickers(ListUtils.removeAll(handCards,

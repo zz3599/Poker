@@ -31,6 +31,10 @@ public abstract class AbstractPokerGameState implements IState{
 		this.state = state;
 	}
 	
+	public GAMESTATE getGameState(){
+		return this.state;
+	}
+	
 	@Override
 	public String getName(){
 		return this.state.name();
