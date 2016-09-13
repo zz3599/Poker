@@ -42,9 +42,12 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 	
 	private PokerGameStateManager addGameStates(Collection<AbstractPokerGameState> gameStates){
 		for(AbstractPokerGameState state : gameStates){
-			this.stateMap.put(state.getGameState(), state);
-			// Perform any initialization upon entering the state
-			state.entered();
+			// Prevent overwriting game states
+			if (!stateMap.containsKey(state.getGameState())){
+				this.stateMap.put(state.getGameState(), state);
+				// Perform any initialization upon entering the state
+				state.entered();
+			}
 		}
 		return this;
 	}
