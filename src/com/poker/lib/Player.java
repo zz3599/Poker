@@ -1,10 +1,13 @@
 package com.poker.lib;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.poker.exception.ErrorCode;
 import com.poker.exception.PokerException;
 import com.poker.hand.Hand;
 
-public class Player {
+public class Player implements IRenderable {
 	public static final int DEFAULT_MONEY = 1000;
 	private final PokerGameContext context;
 	public String name;
@@ -64,6 +67,11 @@ public class Player {
 			return true;
 		}
 		return ((Player) other).name.equalsIgnoreCase(this.name);
+	}
+
+	@Override
+	public String getImageURL() {
+		return null;
 	}
 
 }

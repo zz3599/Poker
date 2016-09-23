@@ -1,6 +1,10 @@
 package com.poker.lib;
 
-public class Card implements Comparable<Card> {
+import java.util.Arrays;
+import java.util.List;
+
+public class Card implements Comparable<Card>, IRenderable {
+	private static final String IMAGE_LOCATION = "res/cards/";
 	/** Value 0/1 has no printable value */
 	public static String[] VALUE_STRINGS = { null, null, "2", "3", "4", "5", "6",
 			"7", "8", "9", "10", "J", "Q", "K", "A" };
@@ -50,5 +54,10 @@ public class Card implements Comparable<Card> {
 			return this.suite.ordinal() - o.suite.ordinal();
 		}
 		return this.value - o.value;
+	}
+
+	@Override
+	public String getImageURL() {
+		return IMAGE_LOCATION + this.value + "_of_" + suite.toString().toLowerCase() + ".png";		
 	}
 }

@@ -17,7 +17,7 @@ public class TestHand {
 	
 	@Test
 	public void TestCardsArrayConstructor(){
-		Hand hand = new Hand(new Card[]{new Card(Suite.DIAMOND, 2), new Card(Suite.CLUB, 4)});
+		Hand hand = new Hand(new Card[]{new Card(Suite.DIAMONDS, 2), new Card(Suite.CLUBS, 4)});
 		Assert.assertEquals(hand.getHandSize(), Hand.POKER_HAND_SIZE);
 		Assert.assertEquals(hand.getCards().size(), Hand.POKER_HAND_SIZE);
 	}

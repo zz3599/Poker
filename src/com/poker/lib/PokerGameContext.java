@@ -81,4 +81,8 @@ public class PokerGameContext {
 		}
 		throw new RuntimeException("Game is full, cannot be seated");
 	}
+	
+	public RenderList getRenderList(){
+		return new RenderList(this.communityCards, this.playerMap.values());	
+	}
 }

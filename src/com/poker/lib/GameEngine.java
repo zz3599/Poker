@@ -17,11 +17,15 @@ import com.poker.state.StartGameState;
 import com.poker.state.StartRoundState;
 import com.poker.state.TurnState;
 import com.poker.state.statemanager.PokerGameStateManager;
+import com.poker.ui.PokerFrame;
+import com.poker.ui.RenderManager;
 
 public class GameEngine implements Runnable {
 	private PokerGameStateManager stateManager;
 	private PokerGameContext context;
-
+	private PokerFrame frame;
+	private RenderManager renderManager;
+	
 	public GameEngine() {
 		/**
 		 * TODO: this engine should populate a list of generic Istatemanagers,
@@ -57,15 +61,26 @@ public class GameEngine implements Runnable {
 				.addTransition(GAMESTATE.RIVER, GAMESTATE.POSTRIVER_BET)
 				.addTransition(GAMESTATE.POSTRIVER_BET, GAMESTATE.ENDROUND)
 				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);
+		this.frame = new PokerFrame(this);
+		this.renderManager = new RenderManager(this.frame.getGraphics(), this.frame.getContentPane());
 	}
 
 	public void start() {
-
+		// Initialize the state
 	}
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
+		// 1. Process events from the UI -> change state, context, etc.
+		// 2. Render the current state.
+		while(true){			
+			try {
+				this.renderManager.render(this.context.getRenderList());
+				Thread.sleep(10000);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 
