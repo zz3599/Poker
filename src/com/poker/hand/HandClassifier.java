@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.Set;
 
 import com.engine.utils.ListUtils;
-import com.poker.Card;
+import com.poker.lib.Card;
+import com.poker.lib.Suite;
 
 public class HandClassifier {
 	public static final int DEFAULT_POKER_HAND_SIZE = 5;
 	int[] seenValues = new int[Card.MAX_VALUE + 1]; // lowest card value starts
 													// at 1, goes up to 13
-	int[] seenSuites = new int[Card.Suite.values().length];
+	int[] seenSuites = new int[Suite.values().length];
 
 	/**
 	 * In cases of 4-kind, 3-kind, 2-pair, 1-pair, it keeps track of the values

@@ -1,7 +1,7 @@
 package com.poker.command;
 
-import com.poker.Player;
 import com.poker.exception.PokerException;
+import com.poker.lib.Player;
 import com.poker.state.AbstractPokerGameState;
 
 public class BetCommand implements PokerCommand {

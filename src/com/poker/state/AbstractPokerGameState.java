@@ -1,8 +1,8 @@
 package com.poker.state;
 
 import com.engine.state.IState;
-import com.poker.Card;
-import com.poker.PokerGameContext;
+import com.poker.lib.Card;
+import com.poker.lib.PokerGameContext;
 
 public abstract class AbstractPokerGameState implements IState{
 	protected PokerGameContext context;

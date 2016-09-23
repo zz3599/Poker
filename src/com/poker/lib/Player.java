@@ -1,4 +1,4 @@
-package com.poker;
+package com.poker.lib;
 
 import com.poker.exception.ErrorCode;
 import com.poker.exception.PokerException;

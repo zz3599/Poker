@@ -2,7 +2,7 @@ package com.poker.hand;
 
 import java.util.Comparator;
 
-import com.poker.Card;
+import com.poker.lib.Card;
 
 public class CardSuiteComparator implements Comparator<Card> {
 

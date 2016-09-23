@@ -1,6 +1,6 @@
 package com.poker.state;
 
-import com.poker.PokerGameContext;
+import com.poker.lib.PokerGameContext;
 
 public class MenuState extends AbstractPokerGameState{
 	public MenuState(PokerGameContext context) {

@@ -6,11 +6,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.poker.Card;
 import com.poker.hand.Hand;
 import com.poker.hand.HandClassification;
 import com.poker.hand.HandClassifier;
 import com.poker.hand.HandRank;
+import com.poker.lib.Card;
+import com.poker.lib.Suite;
 
 public class TestHandClassifier {
 	HandClassifier classifier;
@@ -23,13 +24,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestStraightFlush(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 8),
-				new Card(Card.Suite.CLUB, 6),
-				new Card(Card.Suite.CLUB, 2), 
-				new Card(Card.Suite.CLUB, 3),				
-				new Card(Card.Suite.HEARTS, 7)
+				new Card(Suite.HEARTS, 8),
+				new Card(Suite.CLUB, 6),
+				new Card(Suite.CLUB, 2), 
+				new Card(Suite.CLUB, 3),				
+				new Card(Suite.HEARTS, 7)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.CLUB, 4), new Card(Card.Suite.CLUB, 5));
+		Hand hand = new Hand(new Card(Suite.CLUB, 4), new Card(Suite.CLUB, 5));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.STRAIGHT_FLUSH);
 		//111 1100
@@ -41,13 +42,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestFourOfAKind(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 3),
-				new Card(Card.Suite.CLUB, 3),
-				new Card(Card.Suite.HEARTS, 4), 
-				new Card(Card.Suite.SPADE, 4),				
-				new Card(Card.Suite.CLUB, 4)
+				new Card(Suite.HEARTS, 3),
+				new Card(Suite.CLUB, 3),
+				new Card(Suite.HEARTS, 4), 
+				new Card(Suite.SPADE, 4),				
+				new Card(Suite.CLUB, 4)
 		};		
-		Hand hand = new Hand(new Card(Card.Suite.DIAMOND, 3), new Card(Card.Suite.SPADE, 3));
+		Hand hand = new Hand(new Card(Suite.DIAMOND, 3), new Card(Suite.SPADE, 3));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.FOUR_KIND);
 		// 1000
@@ -59,13 +60,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestFullHouse(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 3),
-				new Card(Card.Suite.CLUB, 7),
-				new Card(Card.Suite.HEARTS, 4), 
-				new Card(Card.Suite.SPADE, 4),				
-				new Card(Card.Suite.CLUB, 8)
+				new Card(Suite.HEARTS, 3),
+				new Card(Suite.CLUB, 7),
+				new Card(Suite.HEARTS, 4), 
+				new Card(Suite.SPADE, 4),				
+				new Card(Suite.CLUB, 8)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.DIAMOND, 3), new Card(Card.Suite.CLUB, 4));
+		Hand hand = new Hand(new Card(Suite.DIAMOND, 3), new Card(Suite.CLUB, 4));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.FULL_HOUSE);
 		// 1 1000
@@ -77,13 +78,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestFlush(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 3),
-				new Card(Card.Suite.HEARTS, 4),
-				new Card(Card.Suite.HEARTS, 7), 
-				new Card(Card.Suite.SPADE, 10),				
-				new Card(Card.Suite.CLUB, 14)
+				new Card(Suite.HEARTS, 3),
+				new Card(Suite.HEARTS, 4),
+				new Card(Suite.HEARTS, 7), 
+				new Card(Suite.SPADE, 10),				
+				new Card(Suite.CLUB, 14)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.HEARTS, 11), new Card(Card.Suite.HEARTS, 14));
+		Hand hand = new Hand(new Card(Suite.HEARTS, 11), new Card(Suite.HEARTS, 14));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.FLUSH);
 		// 100 1000 1001 1000
@@ -95,13 +96,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestStraight(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 10),				 
-				new Card(Card.Suite.SPADE, 13),				
-				new Card(Card.Suite.CLUB, 14),
-				new Card(Card.Suite.HEARTS, 14),
-				new Card(Card.Suite.DIAMOND, 14)
+				new Card(Suite.HEARTS, 10),				 
+				new Card(Suite.SPADE, 13),				
+				new Card(Suite.CLUB, 14),
+				new Card(Suite.HEARTS, 14),
+				new Card(Suite.DIAMOND, 14)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.HEARTS, 11), new Card(Card.Suite.DIAMOND, 12));
+		Hand hand = new Hand(new Card(Suite.HEARTS, 11), new Card(Suite.DIAMOND, 12));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.STRAIGHT);
 		// 111 1100 0000 0000
@@ -113,13 +114,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestThreeOfKind(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 2),				 
-				new Card(Card.Suite.SPADE, 3),				
-				new Card(Card.Suite.CLUB, 4),
-				new Card(Card.Suite.HEARTS, 7),
-				new Card(Card.Suite.DIAMOND, 8)
+				new Card(Suite.HEARTS, 2),				 
+				new Card(Suite.SPADE, 3),				
+				new Card(Suite.CLUB, 4),
+				new Card(Suite.HEARTS, 7),
+				new Card(Suite.DIAMOND, 8)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.DIAMOND, 2), new Card(Card.Suite.SPADE, 2));
+		Hand hand = new Hand(new Card(Suite.DIAMOND, 2), new Card(Suite.SPADE, 2));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.THREE_KIND);
 		// 00 0000 0100
@@ -131,13 +132,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestTwoPair(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 2),				 
-				new Card(Card.Suite.SPADE, 3),				
-				new Card(Card.Suite.CLUB, 4),
-				new Card(Card.Suite.HEARTS, 7),
-				new Card(Card.Suite.DIAMOND, 8)
+				new Card(Suite.HEARTS, 2),				 
+				new Card(Suite.SPADE, 3),				
+				new Card(Suite.CLUB, 4),
+				new Card(Suite.HEARTS, 7),
+				new Card(Suite.DIAMOND, 8)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.DIAMOND, 2), new Card(Card.Suite.HEARTS, 8));
+		Hand hand = new Hand(new Card(Suite.DIAMOND, 2), new Card(Suite.HEARTS, 8));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.TWO_PAIR);
 		// 1 0000 0100
@@ -149,13 +150,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestOnePair(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 2),				 
-				new Card(Card.Suite.SPADE, 3),				
-				new Card(Card.Suite.CLUB, 4),
-				new Card(Card.Suite.HEARTS, 7),
-				new Card(Card.Suite.DIAMOND, 8)
+				new Card(Suite.HEARTS, 2),				 
+				new Card(Suite.SPADE, 3),				
+				new Card(Suite.CLUB, 4),
+				new Card(Suite.HEARTS, 7),
+				new Card(Suite.DIAMOND, 8)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.DIAMOND, 2), new Card(Card.Suite.HEARTS, 14));
+		Hand hand = new Hand(new Card(Suite.DIAMOND, 2), new Card(Suite.HEARTS, 14));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.PAIR);
 		// 0100
@@ -167,13 +168,13 @@ public class TestHandClassifier {
 	@Test
 	public void TestHighCard(){
 		Card[] communityCards = new Card[]{
-				new Card(Card.Suite.HEARTS, 2),				 
-				new Card(Card.Suite.SPADE, 3),				
-				new Card(Card.Suite.CLUB, 4),
-				new Card(Card.Suite.HEARTS, 7),
-				new Card(Card.Suite.DIAMOND, 8)
+				new Card(Suite.HEARTS, 2),				 
+				new Card(Suite.SPADE, 3),				
+				new Card(Suite.CLUB, 4),
+				new Card(Suite.HEARTS, 7),
+				new Card(Suite.DIAMOND, 8)
 		};
-		Hand hand = new Hand(new Card(Card.Suite.DIAMOND, 13), new Card(Card.Suite.HEARTS, 14));
+		Hand hand = new Hand(new Card(Suite.DIAMOND, 13), new Card(Suite.HEARTS, 14));
 		HandClassification classification = classifier.getHandClassification(Arrays.asList(communityCards), hand);
 		Assert.assertTrue(classification.getHandRank() == HandRank.HIGH_CARD);
 		// 0

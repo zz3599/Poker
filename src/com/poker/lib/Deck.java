@@ -1,4 +1,4 @@
-package com.poker;
+package com.poker.lib;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
@@ -28,7 +28,7 @@ public class Deck {
 		this.dealtCards = new boolean[DEFAULT_DECK_SIZE];
 		
 		for(int i = 0; i < DEFAULT_DECK_SIZE; i++) {
-			cards[i] = new Card(Card.Suite.getSuite(i / DEFAULT_SUITE_SIZE), Card.MIN_VALUE + (i % DEFAULT_SUITE_SIZE));
+			cards[i] = new Card(Suite.getSuite(i / DEFAULT_SUITE_SIZE), Card.MIN_VALUE + (i % DEFAULT_SUITE_SIZE));
 			System.out.println(cards[i]);
 		}
 		

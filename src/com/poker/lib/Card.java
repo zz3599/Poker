@@ -1,24 +1,9 @@
-package com.poker;
+package com.poker.lib;
 
 public class Card implements Comparable<Card> {
 	/** Value 0/1 has no printable value */
 	public static String[] VALUE_STRINGS = { null, null, "2", "3", "4", "5", "6",
 			"7", "8", "9", "10", "J", "Q", "K", "A" };
-
-	public enum Suite {
-		CLUB, HEARTS, DIAMOND, SPADE;
-
-		public static Suite getSuite(int value) {
-			if (value > Suite.values().length) {
-				value = value % 4;
-			}
-			return Suite.values()[value];
-		}
-
-		public String toString() {
-			return this.name().substring(0, 1);
-		}
-	}
 
 	//Start from 2, Ace = 14
 	public static Integer MIN_VALUE = 2;

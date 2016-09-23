@@ -1,20 +1,15 @@
 package com.poker;
 
+import com.poker.lib.GameEngine;
+import com.poker.ui.PokerFrame;
+
 public class Main {
-	public static final String[] names = new String[]{"Alex", "Bob"};
-	
-	public static void main(String[] args) {		
-		PokerGameContext game = new PokerGameContext();
-		GameEngine engine = new GameEngine(game);
-		for(String name : names){
-			game.addPlayer(new Player(name, game));
-		}
-		for(int i = 0; i < 5; i++){
-			System.out.println("Game " + i);
-			game.deal();
-			//TODO: game.gameloop
-			game.endRound();;
-		}
+	public static final String[] names = new String[] { "Alex", "Bob" };
+
+	public static void main(String[] args) {
+		GameEngine engine = new GameEngine();		
+		engine.run();
 		
+		PokerFrame frame = new PokerFrame(engine);
 	}
 }

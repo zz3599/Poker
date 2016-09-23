@@ -2,7 +2,7 @@ package com.poker.hand;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.poker.Card;
+import com.poker.lib.Card;
 
 public class Hand {
 	public static final int POKER_HAND_SIZE = 2;

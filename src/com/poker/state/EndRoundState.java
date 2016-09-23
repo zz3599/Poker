@@ -1,6 +1,6 @@
 package com.poker.state;
 
-import com.poker.PokerGameContext;
+import com.poker.lib.PokerGameContext;
 
 public class EndRoundState extends AbstractPokerGameState{
 	public EndRoundState(PokerGameContext context) {
@@ -9,8 +9,7 @@ public class EndRoundState extends AbstractPokerGameState{
 
 	@Override
 	public void entered() {
-		// TODO Auto-generated method stub
-		
+		this.context.endRound();		
 	}
 
 	@Override

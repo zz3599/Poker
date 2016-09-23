@@ -1,6 +1,6 @@
 package com.poker.state;
 
-import com.poker.PokerGameContext;
+import com.poker.lib.PokerGameContext;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
 public class PreflopBetState extends AbstractPokerGameState{

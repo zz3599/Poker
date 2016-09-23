@@ -6,9 +6,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.poker.Card;
 import com.poker.hand.HandClassification;
 import com.poker.hand.HandRank;
+import com.poker.lib.Card;
+import com.poker.lib.Suite;
 
 public class TestHandClassification {
 	private static final List<HandClassification> handClassifications = Arrays
@@ -57,11 +58,11 @@ public class TestHandClassification {
 	public void TestHandClassificationComparisonSameRanksDifferentValue() {
 		// Different cardValue
 		HandClassification class1 = new HandClassification(HandRank.PAIR,
-				Arrays.asList(new Card[] { new Card(Card.Suite.CLUB, 4),
-						new Card(Card.Suite.HEARTS, 4) }));
+				Arrays.asList(new Card[] { new Card(Suite.CLUB, 4),
+						new Card(Suite.HEARTS, 4) }));
 		HandClassification class2 = new HandClassification(HandRank.PAIR,
-				Arrays.asList(new Card[] { new Card(Card.Suite.CLUB, 5),
-						new Card(Card.Suite.HEARTS, 5) }));
+				Arrays.asList(new Card[] { new Card(Suite.CLUB, 5),
+						new Card(Suite.HEARTS, 5) }));
 		// 4 < 5;
 		System.out.println(class1.compareTo(class2));
 		Assert.assertTrue(class1.compareTo(class2) < 0);
@@ -71,13 +72,13 @@ public class TestHandClassification {
 	public void TestHandClassificationComparisonSameRanksSameValueDifferentKicker() {
 		// Same cardValue, different kickers
 		HandClassification class1 = new HandClassification(HandRank.PAIR,
-				Arrays.asList(new Card[] { new Card(Card.Suite.CLUB, 4),
-						new Card(Card.Suite.HEARTS, 4) }),
-				Arrays.asList(new Card[] { new Card(Card.Suite.CLUB, 14), new Card(Card.Suite.CLUB, 13) }));
+				Arrays.asList(new Card[] { new Card(Suite.CLUB, 4),
+						new Card(Suite.HEARTS, 4) }),
+				Arrays.asList(new Card[] { new Card(Suite.CLUB, 14), new Card(Suite.CLUB, 13) }));
 		HandClassification class2 = new HandClassification(HandRank.PAIR,
-				Arrays.asList(new Card[] { new Card(Card.Suite.CLUB, 4),
-						new Card(Card.Suite.HEARTS, 4) }),
-				Arrays.asList(new Card[] {new Card(Card.Suite.CLUB, 14), new Card(Card.Suite.CLUB, 12)}));
+				Arrays.asList(new Card[] { new Card(Suite.CLUB, 4),
+						new Card(Suite.HEARTS, 4) }),
+				Arrays.asList(new Card[] {new Card(Suite.CLUB, 14), new Card(Suite.CLUB, 12)}));
 		// 13 > 12		
 		Assert.assertTrue(class1.compareTo(class2) > 0);
 	}

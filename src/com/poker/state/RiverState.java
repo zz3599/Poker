@@ -1,6 +1,6 @@
 package com.poker.state;
 
-import com.poker.PokerGameContext;
+import com.poker.lib.PokerGameContext;
 
 public class RiverState extends AbstractPokerGameState{
 	public RiverState(PokerGameContext context) {

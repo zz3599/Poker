@@ -1,4 +1,4 @@
-package com.poker;
+package com.poker.lib;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

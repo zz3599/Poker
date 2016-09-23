@@ -1,4 +1,4 @@
-package com.poker;
+package com.poker.lib;
 
 import java.util.Arrays;
 import java.util.List;
@@ -68,4 +68,12 @@ public class GameEngine implements Runnable {
 		// TODO Auto-generated method stub
 
 	}
+
+	public PokerGameStateManager getStateManager() {
+		return stateManager;
+	}
+
+	public PokerGameContext getContext() {
+		return context;
+	}	
 }

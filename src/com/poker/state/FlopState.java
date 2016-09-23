@@ -1,6 +1,6 @@
 package com.poker.state;
 
-import com.poker.PokerGameContext;
+import com.poker.lib.PokerGameContext;
 
 public class FlopState extends AbstractPokerGameState{
 	public FlopState(PokerGameContext context) {
@@ -9,8 +9,11 @@ public class FlopState extends AbstractPokerGameState{
 
 	@Override
 	public void entered() {
-		// TODO Auto-generated method stub
-		
+		try {
+			this.context.flop();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override

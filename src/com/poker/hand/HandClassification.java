@@ -3,7 +3,7 @@ package com.poker.hand;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.poker.Card;
+import com.poker.lib.Card;
 
 import junit.framework.Assert;
 
