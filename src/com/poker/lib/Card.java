@@ -1,7 +1,5 @@
 package com.poker.lib;
 
-import java.util.Arrays;
-import java.util.List;
 
 public class Card implements Comparable<Card>, IRenderable {
 	private static final String IMAGE_LOCATION = "res/cards/";
@@ -16,6 +14,8 @@ public class Card implements Comparable<Card>, IRenderable {
 	public Suite suite;
 	public int value;
 	public Player owner;
+	/** TODO: Change this to false eventually */
+	public boolean revealed = true;
 
 	public Card(Suite suite, int value) {
 		assert value <= MAX_VALUE;
@@ -58,6 +58,9 @@ public class Card implements Comparable<Card>, IRenderable {
 
 	@Override
 	public String getImageURL() {
+		if (!revealed){
+			return IMAGE_LOCATION + "default.png";
+		}
 		return IMAGE_LOCATION + this.value + "_of_" + suite.toString().toLowerCase() + ".png";		
 	}
 }

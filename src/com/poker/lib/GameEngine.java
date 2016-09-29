@@ -3,6 +3,8 @@ package com.poker.lib;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 import com.poker.state.EndRoundState;
@@ -98,4 +100,8 @@ public class GameEngine implements Runnable {
 	public PokerGameContext getContext() {
 		return context;
 	}	
+	
+	public JFrame getFrame(){
+		return frame;
+	}
 }

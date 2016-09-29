@@ -1,6 +1,5 @@
 package com.poker.command;
 
-import com.poker.exception.PokerException;
 import com.poker.lib.Player;
 import com.poker.state.AbstractPokerGameState;
 
@@ -18,15 +17,6 @@ public class BetCommand implements PokerCommand {
 
 	@Override
 	public void apply(AbstractPokerGameState gameState) {
-		//TODO: This needs to be fixed. The bet amount should be stored somewhere else.
-		
-		try {
-			this.player.removeMoney(player.betAmount);
-		} catch (PokerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 
 }

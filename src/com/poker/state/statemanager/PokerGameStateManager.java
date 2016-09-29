@@ -73,13 +73,13 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 		return this.addTransition(initState, endState);
 	}
 	
-	
+	@Override
 	public AbstractPokerGameState getCurrentState(){
 		return this.currentState;
 	}
 	
 	@Override
-	public synchronized void advanceState(GAMESTATE nextState) throws EngineException{
+	public synchronized void advanceState(GAMESTATE nextState) {
 		if (this.stateTransitions.get(this.currentState.getGameState()).contains(nextState)){
 			// Update current state
 			this.currentState.obscuring();
@@ -89,7 +89,7 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 			// Push to stack
 			this.stateStack.push(nextState);
 		} else {
-			throw new EngineException("Invalid next state " + nextState.toString());
+			System.err.println("Invalid target state: " + nextState);
 		}
 		
 	}

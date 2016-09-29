@@ -19,7 +19,8 @@ public abstract class AbstractPokerGameState implements IState{
 		POSTTURN_BET,
 		RIVER, 
 		POSTRIVER_BET,
-		ENDROUND; //end round of poker
+		ENDROUND, //end round of poker
+		EXIT 
 	}
 	
 	protected AbstractPokerGameState(PokerGameContext context){

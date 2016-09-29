@@ -13,6 +13,7 @@ import com.engine.EngineException;
 import com.poker.lib.GameEngine;
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
+import com.poker.ui.listener.ButtonMouseListener;
 
 /**
  * Renders UI, contentpane for the actual game graphics, mouse listener.
@@ -46,11 +47,11 @@ public class PokerPanel extends JPanel {
 		this.playMenuButton.setPreferredSize(new Dimension(this.gamePanel
 				.getPreferredSize().width, this.gamePanel
 				.getPreferredSize().height / 2));		
-		
+		this.playMenuButton.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.STARTROUND));
 		this.exitMenuButton.setPreferredSize(new Dimension(this.gamePanel
 				.getPreferredSize().width, this.gamePanel
 				.getPreferredSize().height / 2));		
-		
+		this.exitMenuButton.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.EXIT));
 		
 	}
 
@@ -61,25 +62,25 @@ public class PokerPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);		
 		AbstractPokerGameState state = engine.getStateManager().getCurrentState();
-		try {
-			switch (state.getGameState()) {
-			case STARTGAME:
-				// Very beginning of the game - render some generic title stuff
-				// Then transition to menu state
-				engine.getStateManager().advanceState(GAMESTATE.MENU);
-				break;
-			case MENU:
-				// Play or exit buttons
-				System.out.println("Current state MENU");				
-				this.gamePanel.add(playMenuButton, BorderLayout.NORTH);
-				this.gamePanel.add(exitMenuButton, BorderLayout.SOUTH);
-				this.revalidate();
-				System.out.println("# components: " + gamePanel.getComponentCount());
-				break;
-			}
-		} catch (EngineException e) {
-			e.printStackTrace();
+		
+		switch (state.getGameState()) {
+		case STARTGAME:
+			// Very beginning of the game - render some generic title stuff
+			// Then transition to menu state
+			engine.getStateManager().advanceState(GAMESTATE.MENU);
+			break;
+		case MENU:
+			// Play or exit buttons			
+			this.gamePanel.add(playMenuButton, BorderLayout.NORTH);
+			this.gamePanel.add(exitMenuButton, BorderLayout.SOUTH);
+			this.revalidate();
+			break;
+		case STARTROUND:
+			this.gamePanel.removeAll();
+			this.revalidate();
+			break;
 		}
+		
 	}
 	
 	public JPanel getGamePanel(){

@@ -1,27 +1,20 @@
 package com.poker.lib;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.poker.exception.ErrorCode;
-import com.poker.exception.PokerException;
 import com.poker.hand.Hand;
 
 public class Player implements IRenderable {
 	public static final int DEFAULT_MONEY = 1000;
-	private final PokerGameContext context;
 	public String name;
 	public Hand hand;
 	public int money;
 	public int betAmount;
 
-	public Player(String name, PokerGameContext context) {
-		this(name, context, DEFAULT_MONEY);
+	public Player(String name) {
+		this(name, DEFAULT_MONEY);
 	}
 
-	public Player(String name, PokerGameContext context, int money) {
+	public Player(String name, int money) {
 		this.name = name;
-		this.context = context;
 		this.money = money;
 	}
 
@@ -31,14 +24,6 @@ public class Player implements IRenderable {
 
 	public void removeHand() {
 		this.hand = null;
-	}
-
-	public void removeMoney(int amt) throws PokerException {
-		if (this.money - amt < 0) {
-			throw new PokerException("No money left to bet", ErrorCode.NOT_ENOUGH_MONEY_TO_BET);
-		}
-		this.money -= amt;
-		this.context.potSize += amt;
 	}
 
 	public void addMoney(int amt) {

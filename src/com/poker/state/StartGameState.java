@@ -34,5 +34,4 @@ public class StartGameState extends AbstractPokerGameState {
 		// TODO Auto-generated method stub
 		
 	}
-
 }

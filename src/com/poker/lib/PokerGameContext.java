@@ -10,7 +10,8 @@ import com.poker.exception.PokerException;
 
 public class PokerGameContext {
 	public static final Integer DEFAULT_GAME_SIZE = 10;
-
+	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "Alex",
+			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris" }; 
 	public final List<Card> communityCards;
 	
 	public int potSize;
@@ -19,7 +20,9 @@ public class PokerGameContext {
 	/** Seat index -> player */
 	public final Map<Integer, Player> playerMap;
 	/** Map to determine if the seats are occupied */
-	public final boolean[] occupiedSeats;
+	public final boolean[] occupiedSeats;	
+	/** The user's player id */
+	public final int playerId = 0;
 
 	public PokerGameContext() {
 		this.deck = new Deck();
@@ -31,7 +34,9 @@ public class PokerGameContext {
 	}
 
 	public void initialize() {
-		this.deal();
+		for(String name : DEFAULT_PLAYER_NAMES){
+			this.addPlayer(new Player(name));
+		}
 	}
 
 	public void endRound() {

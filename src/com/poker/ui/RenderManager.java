@@ -3,6 +3,8 @@ package com.poker.ui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,15 +13,16 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import com.poker.lib.IRenderable;
+import com.poker.lib.Player;
 import com.poker.lib.RenderList;
 
 public class RenderManager {
 	private static final Dimension cardBoundary = new Dimension(100, 100);
-	private Graphics g;
+	private Graphics2D g;
 	private Component c;
 	
 	public RenderManager(Graphics g, Component c){
-		this.g = g;
+		this.g = (Graphics2D)g;
 		this.c = c;
 	}
 	
@@ -37,6 +40,29 @@ public class RenderManager {
 						scaledDimension.height, null);
 				// Render list does not care about the actual content pane.
 				// Content pane should clear the contents
+			}
+		}
+		// We draw the players in a circular fashion. Given a window width, width/2 is the radius.
+		int centerX = c.getWidth()/2;
+		int centerY = c.getHeight()/2;
+		int radius = Math.min(centerX, centerY) - 80;
+		List<IRenderable> players = renderList.getRenderList(RenderList.PLAYER_TYPE);
+		if (players != null){						
+			// Assuming the center of the size dimension is our circle's middle.
+			// Height ratio = sin(2*pi/# players), width ratio = cos(2*pi/# players).
+			// We can start at the actual location of (width/2, height), then rotate in such a fashion.
+			for(int i = 0; i < players.size(); i++){
+				Player player = (Player) players.get(i);
+				float dx = (float)Math.cos(2 * Math.PI * i/ players.size()) * radius; 
+				// For the first player, the dimensions come to (0,1). But we want to start at (0,-1)
+				float dy = (float)(-1 * Math.sin(2 * Math.PI * i / players.size())) * radius;
+				float x = centerX + dx;
+				float y = centerY + dy;
+				//Draw the names
+		        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+		                RenderingHints.VALUE_ANTIALIAS_ON);
+				g.drawString(player.name, x, y);
+				System.out.println("Finished rendering " + player.name);
 			}
 		}
 	}
