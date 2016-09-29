@@ -71,10 +71,7 @@ public class HandClassification implements Comparable<HandClassification> {
 	public int compareTo(HandClassification o) {		
 		if (this.rank.compareTo(o.rank) == 0){
 			assert this.cardValues.size() == o.cardValues.size();
-			// 5 card hands are equivalent regardless
-			if (this.cardValues.size() == 5){
-				return 0;
-			}
+			// If the card ranks are the same, then compare the kickers
 			if (this.getCardRank().compareTo(o.getCardRank()) == 0){
 				return this.getKickerRank().compareTo(o.getKickerRank());
 			}
