@@ -74,7 +74,7 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 	}
 	
 	
-	public AbstractPokerGameState getCurrentState() throws EngineException{
+	public AbstractPokerGameState getCurrentState(){
 		return this.currentState;
 	}
 	
@@ -85,6 +85,7 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 			this.currentState.obscuring();
 			this.currentState = this.stateMap.get(nextState);
 			this.currentState.revealed();
+			System.out.println("Transitioning to " + currentState.getName());
 			// Push to stack
 			this.stateStack.push(nextState);
 		} else {
@@ -103,5 +104,4 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 		}
 		return poppedState;
 	}
-
 }

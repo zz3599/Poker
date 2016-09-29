@@ -21,6 +21,7 @@ import com.poker.ui.PokerFrame;
 import com.poker.ui.RenderManager;
 
 public class GameEngine implements Runnable {
+	private static final int SLEEP_INTERVAL_MS = 500;
 	private PokerGameStateManager stateManager;
 	private PokerGameContext context;
 	private PokerFrame frame;
@@ -36,8 +37,7 @@ public class GameEngine implements Runnable {
 
 		AbstractPokerGameState startState = new StartGameState(context);
 		List<AbstractPokerGameState> gameStates = Arrays
-				.asList(new AbstractPokerGameState[] { 
-						startState,
+				.asList(startState,
 						new EndRoundState(context), new FlopState(context),
 						new MenuState(context), new PostflopBetState(context),
 						new PostriverBetState(context),
@@ -45,10 +45,11 @@ public class GameEngine implements Runnable {
 						new PreflopBetState(context), 
 						new RiverState(context),
 						new StartRoundState(context), 
-						new TurnState(context) });
+						new TurnState(context));
 		this.stateManager = new PokerGameStateManager(startState, gameStates);
-		this.stateManager
-				.addTransition(GAMESTATE.STARTGAME, GAMESTATE.STARTROUND)
+		this.stateManager				
+				.addTransition(GAMESTATE.STARTGAME, GAMESTATE.MENU)
+				.addTransition(GAMESTATE.MENU, GAMESTATE.STARTROUND)
 				.addTransition(GAMESTATE.STARTROUND, GAMESTATE.PREFLOP_BET)
 				.addTransition(GAMESTATE.PREFLOP_BET, GAMESTATE.ENDROUND,
 						GAMESTATE.FLOP)
@@ -62,7 +63,9 @@ public class GameEngine implements Runnable {
 				.addTransition(GAMESTATE.POSTRIVER_BET, GAMESTATE.ENDROUND)
 				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);
 		this.frame = new PokerFrame(this);
-		this.renderManager = new RenderManager(this.frame.getGraphics(), this.frame.getContentPane());
+		this.renderManager = new RenderManager(this.frame.getPokerPanel()
+				.getGamePanel().getGraphics(), this.frame.getPokerPanel()
+				.getGamePanel());
 	}
 
 	public void start() {
@@ -75,8 +78,12 @@ public class GameEngine implements Runnable {
 		// 2. Render the current state.
 		while(true){			
 			try {
-				this.renderManager.render(this.context.getRenderList());
-				Thread.sleep(10000);
+				//Repaint the UI
+				this.frame.getPokerPanel().repaint();				
+				// Render game contents
+				RenderList renderList = this.stateManager.getCurrentState().getRenderList();
+				this.renderManager.render(renderList);
+				Thread.sleep(SLEEP_INTERVAL_MS);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

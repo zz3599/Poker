@@ -1,8 +1,8 @@
 package com.poker.state;
 
 import com.engine.state.IState;
-import com.poker.lib.Card;
 import com.poker.lib.PokerGameContext;
+import com.poker.lib.RenderList;
 
 public abstract class AbstractPokerGameState implements IState{
 	protected PokerGameContext context;
@@ -33,6 +33,14 @@ public abstract class AbstractPokerGameState implements IState{
 	
 	public GAMESTATE getGameState(){
 		return this.state;
+	}
+	
+	/**
+	 * Since the states are aware of what objects should be rendered, the responsibility lies with the states themselves.
+	 * @return
+	 */
+	public RenderList getRenderList(){
+		return new RenderList();
 	}
 	
 	@Override

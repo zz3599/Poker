@@ -12,6 +12,10 @@ public class RenderList {
 
 	private Map<String, List<IRenderable>> renderMap = new HashMap<String, List<IRenderable>>();
 
+	public RenderList(){
+		
+	}
+	
 	public RenderList(Collection<Card> communityCards, Collection<Player> players) {
 		this.renderMap.put(COMMUNITY_CARD_TYPE, new ArrayList<IRenderable>(communityCards));
 		this.renderMap.put(PLAYER_TYPE, new ArrayList<IRenderable>(players));

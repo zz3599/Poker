@@ -20,18 +20,24 @@ public class RenderManager {
 	
 	public RenderManager(Graphics g, Component c){
 		this.g = g;
+		this.c = c;
 	}
 	
 	public void render(RenderList renderList) throws IOException{
 		List<IRenderable> communityCards = renderList.getRenderList(RenderList.COMMUNITY_CARD_TYPE);
-		
-		for(int i = 0; i < communityCards.size(); i++){
-			IRenderable communityCard = communityCards.get(i);
-			System.out.println("Rendering: " + communityCard.getImageURL());
-			BufferedImage img = ImageIO.read(new File(communityCard.getImageURL()));
-			Dimension scaledDimension = getScaledDimension(new Dimension(img.getWidth(), img.getHeight()), cardBoundary);
-			g.drawImage(img, i*100, 0, scaledDimension.width, scaledDimension.height, null);
-			
+		if (communityCards != null) {
+			for (int i = 0; i < communityCards.size(); i++) {
+				IRenderable communityCard = communityCards.get(i);
+				System.out.println("Rendering: " + communityCard.getImageURL());
+				BufferedImage img = ImageIO.read(new File(communityCard
+						.getImageURL()));
+				Dimension scaledDimension = getScaledDimension(new Dimension(
+						img.getWidth(), img.getHeight()), cardBoundary);
+				g.drawImage(img, i * 100, 0, scaledDimension.width,
+						scaledDimension.height, null);
+				// Render list does not care about the actual content pane.
+				// Content pane should clear the contents
+			}
 		}
 	}
 		
