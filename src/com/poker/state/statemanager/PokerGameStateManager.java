@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.Stack;
 
@@ -18,7 +20,7 @@ import com.poker.state.AbstractPokerGameState.GAMESTATE;
  * Maps from enum->pokerstate class containing game context object.
  * Calling advanceState also calls the corresponding targetState's revealed method. 
  */
-public class PokerGameStateManager implements IStateManager<AbstractPokerGameState, GAMESTATE>{
+public class PokerGameStateManager extends Observable implements IStateManager<AbstractPokerGameState, GAMESTATE> {
 	private Map<GAMESTATE, AbstractPokerGameState> stateMap = new HashMap<GAMESTATE, AbstractPokerGameState>();
 	/** Top of the stack is the currentstate */
 	private Stack<GAMESTATE> stateStack = new Stack<GAMESTATE>();
@@ -88,6 +90,9 @@ public class PokerGameStateManager implements IStateManager<AbstractPokerGameSta
 			System.out.println("Transitioning to " + currentState.getName());
 			// Push to stack
 			this.stateStack.push(nextState);
+			// Update observers
+			this.setChanged();
+			this.notifyObservers();
 		} else {
 			System.err.println("Invalid target state: " + nextState);
 		}

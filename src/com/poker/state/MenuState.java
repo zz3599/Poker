@@ -27,7 +27,6 @@ public class MenuState extends AbstractPokerGameState{
 
 	@Override
 	public void revealed() {
-		// TODO Auto-generated method stub
 		
 	}
 }

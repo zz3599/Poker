@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
@@ -63,11 +64,11 @@ public class GameEngine implements Runnable {
 						GAMESTATE.RIVER)
 				.addTransition(GAMESTATE.RIVER, GAMESTATE.POSTRIVER_BET)
 				.addTransition(GAMESTATE.POSTRIVER_BET, GAMESTATE.ENDROUND)
-				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);
+				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);		
 		this.frame = new PokerFrame(this);
-		this.renderManager = new RenderManager(this.frame.getPokerPanel()
-				.getGamePanel().getGraphics(), this.frame.getPokerPanel()
-				.getGamePanel());
+		JPanel gamePanel = frame.getPokerPanel().getGamePanel();
+		this.renderManager = new RenderManager(gamePanel.getGraphics(), gamePanel);
+		this.stateManager.addObserver(this.frame.getPokerPanel());		
 	}
 
 	public void start() {
@@ -80,8 +81,7 @@ public class GameEngine implements Runnable {
 		// 2. Render the current state.
 		while(true){			
 			try {
-				//Repaint the UI
-				this.frame.getPokerPanel().repaint();				
+				// Repaint the UI when there are changes needed							
 				// Render game contents
 				RenderList renderList = this.stateManager.getCurrentState().getRenderList();
 				this.renderManager.render(renderList);

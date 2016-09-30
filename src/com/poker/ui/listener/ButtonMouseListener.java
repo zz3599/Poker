@@ -24,7 +24,7 @@ public class ButtonMouseListener implements MouseListener{
 							WindowEvent.WINDOW_CLOSING));
 			return;
 		}
-		engine.getStateManager().advanceState(targetState);		
+		engine.getStateManager().advanceState(targetState);
 	}
 	
 	@Override

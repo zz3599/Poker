@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.poker.lib.Card;
 import com.poker.lib.IRenderable;
 import com.poker.lib.Player;
 import com.poker.lib.RenderList;
@@ -23,6 +24,8 @@ public class RenderManager {
 	
 	public RenderManager(Graphics g, Component c){
 		this.g = (Graphics2D)g;
+        this.g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
 		this.c = c;
 	}
 	
@@ -43,9 +46,9 @@ public class RenderManager {
 			}
 		}
 		// We draw the players in a circular fashion. Given a window width, width/2 is the radius.
-		int centerX = c.getWidth()/2;
-		int centerY = c.getHeight()/2;
-		int radius = Math.min(centerX, centerY) - 80;
+		int centerX = (int) (c.getWidth() * 0.4);
+		int centerY = (int) (c.getHeight() * 0.4);
+		int radius = Math.min(centerX, centerY);
 		List<IRenderable> players = renderList.getRenderList(RenderList.PLAYER_TYPE);
 		if (players != null){						
 			// Assuming the center of the size dimension is our circle's middle.
@@ -53,16 +56,23 @@ public class RenderManager {
 			// We can start at the actual location of (width/2, height), then rotate in such a fashion.
 			for(int i = 0; i < players.size(); i++){
 				Player player = (Player) players.get(i);
-				float dx = (float)Math.cos(2 * Math.PI * i/ players.size()) * radius; 
 				// For the first player, the dimensions come to (0,1). But we want to start at (0,-1)
-				float dy = (float)(-1 * Math.sin(2 * Math.PI * i / players.size())) * radius;
+				float dx = (float)(Math.sin(2 * Math.PI * i / players.size())) * radius;
+				float dy = (float)(Math.cos(2 * Math.PI * i/ players.size()) * radius); 
+				
 				float x = centerX + dx;
 				float y = centerY + dy;
 				//Draw the names
-		        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-		                RenderingHints.VALUE_ANTIALIAS_ON);
 				g.drawString(player.name, x, y);
-				System.out.println("Finished rendering " + player.name);
+				
+				for(int idx = 0; idx < player.hand.getCards().size(); idx++){
+					Card card = player.hand.getCards().get(idx);
+					BufferedImage img = ImageIO.read(new File(card.getImageURL()));
+					Dimension scaledDimension = getScaledDimension(new Dimension(
+							img.getWidth(), img.getHeight()), cardBoundary);
+					g.drawImage(img, (int) (x + idx * scaledDimension.width), (int) (y + 30), scaledDimension.width,
+							scaledDimension.height, null);
+				}
 			}
 		}
 	}

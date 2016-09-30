@@ -7,8 +7,8 @@ import com.poker.lib.GameEngine;
 public class PokerFrame extends JFrame {
 	private GameEngine engine;
 	private PokerPanel panel;
-	private static final int DEFAULT_WIDTH = 500;
-	private static final int DEFAULT_HEIGHT = 500;
+	private static final int DEFAULT_WIDTH = 1000;
+	private static final int DEFAULT_HEIGHT = 800;
 
 	public PokerFrame(GameEngine engine) {
 		super("Poker");
