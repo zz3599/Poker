@@ -17,6 +17,10 @@ import com.poker.lib.IRenderable;
 import com.poker.lib.Player;
 import com.poker.lib.RenderList;
 
+/**
+ * This renders things, but it shouldn't be stupid. It should cache the images after loading them.
+ *
+ **/
 public class RenderManager {
 	private static final Dimension cardBoundary = new Dimension(100, 100);
 	private Graphics2D g;
@@ -70,6 +74,7 @@ public class RenderManager {
 					BufferedImage img = ImageIO.read(new File(card.getImageURL()));
 					Dimension scaledDimension = getScaledDimension(new Dimension(
 							img.getWidth(), img.getHeight()), cardBoundary);
+					System.out.println("scaled dimension: " + scaledDimension.width + "," + scaledDimension.height);
 					g.drawImage(img, (int) (x + idx * scaledDimension.width), (int) (y + 30), scaledDimension.width,
 							scaledDimension.height, null);
 				}

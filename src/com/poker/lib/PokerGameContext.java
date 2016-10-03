@@ -20,9 +20,12 @@ public class PokerGameContext {
 	/** Seat index -> player */
 	public final Map<Integer, Player> playerMap;
 	/** Map to determine if the seats are occupied */
-	public final boolean[] occupiedSeats;	
+	public final boolean[] occupiedSeats;
 	/** The user's player id */
 	public final int playerId = 0;
+	
+	/** The index of the button player */
+	private int buttonIndex = 0;
 
 	public PokerGameContext() {
 		this.deck = new Deck();
@@ -46,6 +49,7 @@ public class PokerGameContext {
 		this.deck.reset();
 		this.communityCards.clear();
 		this.potSize = 0;
+		this.buttonIndex = (buttonIndex + 1) % this.playerMap.size();
 		//TODO: give the money to somebody
 	}
 

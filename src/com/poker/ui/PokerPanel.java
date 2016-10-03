@@ -96,8 +96,7 @@ public class PokerPanel extends JPanel implements Observer{
 	}
 
 	@Override
-	public void update(Observable o, Object arg) {
-		System.out.println("Observed: " + o + ", " + arg);
+	public void update(Observable o, Object arg) {		
 		this.repaint();		
 	}
 }
