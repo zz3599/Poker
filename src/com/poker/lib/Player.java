@@ -3,12 +3,15 @@ package com.poker.lib;
 import com.poker.hand.Hand;
 
 public class Player implements IRenderable {
+	private static final String IMAGE_LOCATION = "res/board/";
 	public static final int DEFAULT_MONEY = 1000;
 	public String name;
 	public Hand hand;
 	public int money;
 	public int betAmount;
-
+	/** By default false */
+	public boolean isDealer;
+	
 	public Player(String name) {
 		this(name, DEFAULT_MONEY);
 	}
@@ -56,6 +59,9 @@ public class Player implements IRenderable {
 
 	@Override
 	public String getImageURL() {
+		if(this.isDealer){
+			return IMAGE_LOCATION + "dealer.png";
+		}
 		return null;
 	}
 

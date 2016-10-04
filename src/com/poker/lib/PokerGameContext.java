@@ -1,6 +1,7 @@
 package com.poker.lib;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +25,8 @@ public class PokerGameContext {
 	/** The user's player id */
 	public final int playerId = 0;
 	
-	/** The index of the button player */
-	private int buttonIndex = 0;
+	/** The index of the dealer*/
+	private int dealerIndex = -1;
 
 	public PokerGameContext() {
 		this.deck = new Deck();
@@ -40,6 +41,7 @@ public class PokerGameContext {
 		for(String name : DEFAULT_PLAYER_NAMES){
 			this.addPlayer(new Player(name));
 		}
+		this.updateDealer();
 	}
 
 	public void endRound() {
@@ -49,8 +51,17 @@ public class PokerGameContext {
 		this.deck.reset();
 		this.communityCards.clear();
 		this.potSize = 0;
-		this.buttonIndex = (buttonIndex + 1) % this.playerMap.size();
+		this.updateDealer();
 		//TODO: give the money to somebody
+	}
+	
+	private void updateDealer(){
+		this.dealerIndex = (dealerIndex + 1) % this.playerMap.size();
+		if (this.playerMap.get(dealerIndex) == null){
+			System.err.println("No dealer found at index " + dealerIndex);
+		} else {
+			this.playerMap.get(dealerIndex).isDealer = true;
+		}
 	}
 
 	public void deal() {
@@ -89,6 +100,17 @@ public class PokerGameContext {
 			}
 		}
 		throw new RuntimeException("Game is full, cannot be seated");
+	}
+	
+	public synchronized void removePlayer(String name){
+		for(Iterator<Player> it = this.playerMap.values().iterator(); it.hasNext();){
+			Player player = it.next();
+			if (player.name.equalsIgnoreCase(name)){
+				it.remove();
+				return;
+			}
+		}
+		System.err.println("Unable to remove player (not found)" + name);
 	}
 	
 	public RenderList getRenderList(){		

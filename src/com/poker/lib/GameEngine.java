@@ -85,7 +85,7 @@ public class GameEngine implements Runnable {
 				// Render game contents
 				RenderList renderList = this.stateManager.getCurrentState().getRenderList();
 				this.renderManager.render(renderList);
-				Thread.sleep(SLEEP_INTERVAL_MS);
+				Thread.sleep(SLEEP_INTERVAL_MS);				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -25,6 +25,7 @@ import com.poker.utils.LRUCache;
 public class RenderManager {
 	private static final int DEFAULT_CACHE_SIZE = 1000;
 	private static final Dimension cardBoundary = new Dimension(100, 100);
+	private static final Dimension playerBoundary = new Dimension(50, 50);
 	private Graphics2D g;
 	private Component c;
 	private LRUCache<String, ImageInfo> imageCache = new LRUCache<String, ImageInfo>(DEFAULT_CACHE_SIZE, true);
@@ -67,7 +68,7 @@ public class RenderManager {
 				float y = centerY + dy;
 				//Draw the names
 				g.drawString(player.name, x, y);
-				
+				this.render(player, (int)x + 20, (int)y, playerBoundary);
 				for(int idx = 0; idx < player.hand.getCards().size(); idx++){
 					Card card = player.hand.getCards().get(idx);
 					this.render(card, (int) (x + idx * 100), (int) (y + 30), cardBoundary);					
@@ -77,6 +78,9 @@ public class RenderManager {
 	}
 		
 	private void render(IRenderable renderable, int x, int y, Dimension boundary) throws IOException{
+		if (renderable.getImageURL() == null || renderable.getImageURL().isEmpty()){
+			return;
+		}
 		BufferedImage img = null;
 		Dimension scaledDimension = null;
 		// First see if we can get it from the cache.
