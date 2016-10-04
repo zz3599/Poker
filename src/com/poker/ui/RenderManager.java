@@ -16,15 +16,19 @@ import com.poker.lib.Card;
 import com.poker.lib.IRenderable;
 import com.poker.lib.Player;
 import com.poker.lib.RenderList;
+import com.poker.utils.LRUCache;
 
 /**
  * This renders things, but it shouldn't be stupid. It should cache the images after loading them.
  *
  **/
 public class RenderManager {
+	private static final int DEFAULT_CACHE_SIZE = 1000;
 	private static final Dimension cardBoundary = new Dimension(100, 100);
 	private Graphics2D g;
 	private Component c;
+	private LRUCache<String, ImageInfo> imageCache = new LRUCache<String, ImageInfo>(DEFAULT_CACHE_SIZE, true);
+	
 	
 	public RenderManager(Graphics g, Component c){
 		this.g = (Graphics2D)g;
@@ -39,12 +43,7 @@ public class RenderManager {
 			for (int i = 0; i < communityCards.size(); i++) {
 				IRenderable communityCard = communityCards.get(i);
 				System.out.println("Rendering: " + communityCard.getImageURL());
-				BufferedImage img = ImageIO.read(new File(communityCard
-						.getImageURL()));
-				Dimension scaledDimension = getScaledDimension(new Dimension(
-						img.getWidth(), img.getHeight()), cardBoundary);
-				g.drawImage(img, i * 100, 0, scaledDimension.width,
-						scaledDimension.height, null);
+				this.render(communityCard, i*100, 0, cardBoundary);				
 				// Render list does not care about the actual content pane.
 				// Content pane should clear the contents
 			}
@@ -71,17 +70,31 @@ public class RenderManager {
 				
 				for(int idx = 0; idx < player.hand.getCards().size(); idx++){
 					Card card = player.hand.getCards().get(idx);
-					BufferedImage img = ImageIO.read(new File(card.getImageURL()));
-					Dimension scaledDimension = getScaledDimension(new Dimension(
-							img.getWidth(), img.getHeight()), cardBoundary);
-					System.out.println("scaled dimension: " + scaledDimension.width + "," + scaledDimension.height);
-					g.drawImage(img, (int) (x + idx * scaledDimension.width), (int) (y + 30), scaledDimension.width,
-							scaledDimension.height, null);
+					this.render(card, (int) (x + idx * 100), (int) (y + 30), cardBoundary);					
 				}
 			}
 		}
 	}
 		
+	private void render(IRenderable renderable, int x, int y, Dimension boundary) throws IOException{
+		BufferedImage img = null;
+		Dimension scaledDimension = null;
+		// First see if we can get it from the cache.
+		if (this.imageCache.contains(renderable.getImageURL())){
+			ImageInfo imgInfo = this.imageCache.get(renderable.getImageURL());
+			img = imgInfo.getImage();
+			scaledDimension = imgInfo.getDimension();
+		} else {
+			// If not, do the calculations here and then put it in the cache.
+			img = ImageIO.read(new File(renderable
+					.getImageURL()));
+			scaledDimension = getScaledDimension(new Dimension(
+					img.getWidth(), img.getHeight()), boundary);	
+			this.imageCache.put(renderable.getImageURL(), new ImageInfo(scaledDimension, img));
+		}		
+		g.drawImage(img, x, y, scaledDimension.width,
+				scaledDimension.height, null);
+	}
 	/**
 	 * Gets the scaled dimension of imgSize that will fit inside boundary.
 	 * @param imgSize

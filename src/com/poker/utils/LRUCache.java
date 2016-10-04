@@ -29,17 +29,18 @@ public class LRUCache <CACHEKEY, CACHEVALUE>{
 		if(value == null){
 			return;
 		}
-		if (respectCapacity && leastRecentlyUsedMap.size() == capacity){
+		// Insert the key, or put it into the front of the map if it already exists.
+		this.usedKey(key, value);
+		if (respectCapacity && leastRecentlyUsedMap.size() > capacity){
 			//if we respect the capacity value, evict the earliest to make room for the new value.
 			int i = 0;
 			for (Iterator<CACHEVALUE> it = leastRecentlyUsedMap.values().iterator(); it.hasNext()
-					&& i < (leastRecentlyUsedMap.size() + 1 - capacity);) {
+					&& i < (leastRecentlyUsedMap.size() - capacity);) {
 				it.remove();
 				i++;
 			}
 			
 		}
-		this.usedKey(key, value);		
 	}
 	
 	/**
@@ -52,6 +53,10 @@ public class LRUCache <CACHEKEY, CACHEVALUE>{
 			this.usedKey(key, leastRecentlyUsedMap.get(key));
 		}
 		return leastRecentlyUsedMap.get(key);
+	}
+	
+	public boolean contains(CACHEKEY key){
+		return leastRecentlyUsedMap.containsKey(key);
 	}
 	
 	/**
