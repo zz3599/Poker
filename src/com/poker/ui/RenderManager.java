@@ -78,8 +78,12 @@ public class RenderManager {
 			}
 		}
 		//Render the pot size
+		
 		String potSize = renderList.getDrawString(RenderList.POT_SIZE);
-		g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
+		if (potSize != null){
+			System.out.println("Potsize: " + potSize);
+			g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
+		}
 	}
 		
 	private void render(IRenderable renderable, int x, int y, Dimension boundary) throws IOException{
@@ -103,6 +107,7 @@ public class RenderManager {
 		}		
 		g.drawImage(img, x, y, scaledDimension.width,
 				scaledDimension.height, null);
+		System.out.println("Rendered " + renderable.getImageURL());
 	}
 	/**
 	 * Gets the scaled dimension of imgSize that will fit inside boundary.

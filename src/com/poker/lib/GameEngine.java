@@ -83,8 +83,7 @@ public class GameEngine implements Runnable {
 			try {
 				// Repaint the UI when there are changes needed							
 				// Render game contents
-				RenderList renderList = this.stateManager.getCurrentState().getRenderList();
-				this.renderManager.render(renderList);
+				//frame.getPokerPanel().getGamePanel().repaint();				
 				Thread.sleep(SLEEP_INTERVAL_MS);				
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -46,10 +48,10 @@ public class PokerPanel extends JPanel implements Observer{
 	public PokerPanel(GameEngine engine, int width, int height) {
 		this.width = width;
 		this.height = height;
-		this.setBackground(Color.BLACK);
+		this.setBackground(Color.GRAY);
 		this.engine = engine;
 		this.setPreferredSize(new Dimension(width, height));
-		this.gamePanel = new JPanel(new BorderLayout());
+		this.gamePanel = new GamePanel(new BorderLayout(), engine);
 		this.gamePanel.setPreferredSize(new Dimension(width,
 				(int) (gamePanelRatio * height)));
 		this.actionPanel = new JPanel(new FlowLayout());
@@ -77,13 +79,17 @@ public class PokerPanel extends JPanel implements Observer{
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);		
+		super.paintComponent(g);	
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        
 		AbstractPokerGameState state = engine.getStateManager().getCurrentState();
 		
 		switch (state.getGameState()) {
 		case STARTGAME:
 			// Very beginning of the game - render some generic title stuff
 			System.out.println("Loading...");
+			this.gamePanel.removeAll();
 			this.gamePanel.add(loadingLabel, BorderLayout.CENTER);			
 			break;
 		case MENU:
@@ -101,7 +107,6 @@ public class PokerPanel extends JPanel implements Observer{
 			break;
 		}
 		this.revalidate();
-		
 	}
 	
 	public JPanel getGamePanel(){
