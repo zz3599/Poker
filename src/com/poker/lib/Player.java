@@ -31,6 +31,9 @@ public class Player implements IRenderable {
 
 	public void addMoney(int amt) {
 		this.money += amt;
+		if (money < 0) {
+			money = 0;
+		}
 	}
 
 	public String toString() {

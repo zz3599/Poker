@@ -40,7 +40,7 @@ public class RenderManager {
 	
 	public void render(RenderList renderList) throws IOException{
 		List<IRenderable> communityCards = renderList.getRenderList(RenderList.COMMUNITY_CARD_TYPE);
-		if (communityCards != null) {
+		if (communityCards != null) {			
 			for (int i = 0; i < communityCards.size(); i++) {
 				IRenderable communityCard = communityCards.get(i);
 				System.out.println("Rendering: " + communityCard.getImageURL());
@@ -54,7 +54,9 @@ public class RenderManager {
 		int centerY = (int) (c.getHeight() * 0.4);
 		int radius = Math.min(centerX, centerY);
 		List<IRenderable> players = renderList.getRenderList(RenderList.PLAYER_TYPE);
-		if (players != null){						
+		if (players != null){		
+			//Clear the rendered stuff so we don't repeatedly draw on top		
+			g.clearRect(0, 0, c.getWidth(), c.getHeight());
 			// Assuming the center of the size dimension is our circle's middle.
 			// Height ratio = sin(2*pi/# players), width ratio = cos(2*pi/# players).
 			// We can start at the actual location of (width/2, height), then rotate in such a fashion.
@@ -71,10 +73,13 @@ public class RenderManager {
 				this.render(player, (int)x + 20, (int)y, playerBoundary);
 				for(int idx = 0; idx < player.hand.getCards().size(); idx++){
 					Card card = player.hand.getCards().get(idx);
-					this.render(card, (int) (x + idx * 100), (int) (y + 30), cardBoundary);					
+					this.render(card, (int) (x + idx * 70), (int) (y + 30), cardBoundary);					
 				}
 			}
 		}
+		//Render the pot size
+		String potSize = renderList.getDrawString(RenderList.POT_SIZE);
+		g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
 	}
 		
 	private void render(IRenderable renderable, int x, int y, Dimension boundary) throws IOException{

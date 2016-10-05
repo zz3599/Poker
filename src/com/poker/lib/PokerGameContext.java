@@ -6,12 +6,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Observable;
 
 import com.poker.exception.PokerException;
+import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
-public class PokerGameContext {
+public class PokerGameContext extends Observable {
 	public static final Integer DEFAULT_GAME_SIZE = 10;
-	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "Alex",
+	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
 			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris" }; 
 	public final List<Card> communityCards;
 	
@@ -27,6 +29,8 @@ public class PokerGameContext {
 	
 	/** The index of the dealer*/
 	private int dealerIndex = -1;
+	
+	private BlindsPolicy blindsPolicy;
 
 	public PokerGameContext() {
 		this.deck = new Deck();
@@ -34,6 +38,7 @@ public class PokerGameContext {
 		this.occupiedSeats = new boolean[DEFAULT_GAME_SIZE];
 		this.playerMap = new LinkedHashMap<Integer, Player>();
 		this.potSize = 0;
+		this.blindsPolicy = new BlindsPolicy(100, 200, 100, 1);
 		this.initialize();
 	}
 
@@ -52,6 +57,8 @@ public class PokerGameContext {
 		this.communityCards.clear();
 		this.potSize = 0;
 		this.updateDealer();
+		this.setChanged();
+		this.notifyObservers(GAMESTATE.ENDROUND.toString());
 		//TODO: give the money to somebody
 	}
 	
@@ -64,7 +71,12 @@ public class PokerGameContext {
 		}
 	}
 
-	public void deal() {
+	public void startRound(){
+		this.deal();
+		this.collectAnte();
+	}
+	
+	private void deal() {
 		try {
 			this.deck.shuffle();
 			this.deck.deal(this.playerMap.values());
@@ -74,6 +86,15 @@ public class PokerGameContext {
 		} catch (PokerException e) {
 			System.out.println(e);
 		}
+	}
+	
+	private void collectAnte(){
+		int smallBlindIndex = (this.dealerIndex - 1 + playerMap.size()) % playerMap.size();
+		int bigBlindIndex = (this.dealerIndex - 2 + playerMap.size()) % playerMap.size();
+		System.out.println("Collecting blinds from " + smallBlindIndex + "," + bigBlindIndex);
+		this.playerMap.get(smallBlindIndex).addMoney(-blindsPolicy.getSmallBlind());
+		this.playerMap.get(bigBlindIndex).addMoney(-blindsPolicy.getBigBlind());
+		this.potSize += blindsPolicy.getSmallBlind() + blindsPolicy.getBigBlind();
 	}
 
 	public List<Card> flop() throws PokerException{
@@ -114,6 +135,6 @@ public class PokerGameContext {
 	}
 	
 	public RenderList getRenderList(){		
-		return new RenderList(this.communityCards, this.playerMap.values());	
+		return new RenderList(this.communityCards, this.playerMap.values(), Integer.toString(potSize));	
 	}
 }

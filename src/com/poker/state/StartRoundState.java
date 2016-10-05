@@ -25,11 +25,11 @@ public class StartRoundState extends AbstractPokerGameState{
 	}
 
 	/**
-	 * When the round starts, we deal the cards.
+	 * When the round starts, we deal the cards and collect the ante.
 	 */
 	@Override
 	public void revealed() {
-		this.context.deal();		
+		this.context.startRound();		
 	}
 	
 	@Override

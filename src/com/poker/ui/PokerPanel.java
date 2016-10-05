@@ -11,6 +11,7 @@ import java.util.Observer;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 import com.poker.lib.GameEngine;
 import com.poker.state.AbstractPokerGameState;
@@ -29,10 +30,18 @@ public class PokerPanel extends JPanel implements Observer{
 	private static final double gamePanelRatio = 0.8;
 	private int width;
 	private int height;
+	/** Label when in start game */
+	private JLabel loadingLabel = new JLabel("Loading...");
 	
+	/** Menu state*/
 	private JButton playMenuButton = new JButton("Play");
 	private JButton exitMenuButton = new JButton("Exit");
-	private JLabel loadingLabel = new JLabel("Loading...");
+	
+	private JButton betButton = new JButton("Bet");
+	private JSlider betSlider = new JSlider();
+	private JButton checkButton = new JButton("Check");
+	private JButton foldButton = new JButton("Fold");
+	
 	
 	public PokerPanel(GameEngine engine, int width, int height) {
 		this.width = width;
@@ -84,7 +93,11 @@ public class PokerPanel extends JPanel implements Observer{
 			this.gamePanel.add(exitMenuButton, BorderLayout.SOUTH);
 			break;
 		case STARTROUND:
-			this.gamePanel.removeAll();			
+			this.gamePanel.removeAll();
+			this.actionPanel.add(betButton);
+			this.actionPanel.add(betSlider);
+			this.actionPanel.add(checkButton);
+			this.actionPanel.add(foldButton);
 			break;
 		}
 		this.revalidate();
