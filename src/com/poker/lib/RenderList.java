@@ -12,21 +12,21 @@ public class RenderList {
 	
 	public static final String POT_SIZE = "pot_size";
 
-	private Map<String, List<IRenderable>> renderMap = new HashMap<String, List<IRenderable>>();
+	private Map<String, List<? extends IRenderable>> renderMap = new HashMap<String, List<? extends IRenderable>>();
 	private Map<String, String> drawMap = new HashMap<String, String>();
 	
 	public RenderList(){
 		
 	}
 	
-	public RenderList(Collection<Card> communityCards, Collection<Player> players, String potSize) {
-		this.renderMap.put(COMMUNITY_CARD_TYPE, new ArrayList<IRenderable>(communityCards));
-		this.renderMap.put(PLAYER_TYPE, new ArrayList<IRenderable>(players));		
+	public RenderList(List<Card> communityCards, List<Player> players, String potSize) {
+		this.renderMap.put(COMMUNITY_CARD_TYPE, communityCards);
+		this.renderMap.put(PLAYER_TYPE, players);		
 		this.drawMap.put(POT_SIZE, potSize);
 	}
 	
 	public List<IRenderable> getRenderList(String renderType){
-		return renderMap.get(renderType);
+		return (List<IRenderable>) renderMap.get(renderType);
 	}
 	
 	public String getDrawString(String key){

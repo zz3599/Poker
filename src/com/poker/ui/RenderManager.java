@@ -8,11 +8,11 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.poker.lib.Card;
 import com.poker.lib.IRenderable;
 import com.poker.lib.Player;
 import com.poker.lib.RenderList;
@@ -54,9 +54,7 @@ public class RenderManager {
 		int centerY = (int) (c.getHeight() * 0.4);
 		int radius = Math.min(centerX, centerY);
 		List<IRenderable> players = renderList.getRenderList(RenderList.PLAYER_TYPE);
-		if (players != null){		
-			//Clear the rendered stuff so we don't repeatedly draw on top		
-			g.clearRect(0, 0, c.getWidth(), c.getHeight());
+		if (players != null){
 			// Assuming the center of the size dimension is our circle's middle.
 			// Height ratio = sin(2*pi/# players), width ratio = cos(2*pi/# players).
 			// We can start at the actual location of (width/2, height), then rotate in such a fashion.
@@ -70,19 +68,26 @@ public class RenderManager {
 				float y = centerY + dy;
 				//Draw the names
 				g.drawString(player.name, x, y);
-				this.render(player, (int)x + 20, (int)y, playerBoundary);
-				for(int idx = 0; idx < player.hand.getCards().size(); idx++){
-					Card card = player.hand.getCards().get(idx);
-					this.render(card, (int) (x + idx * 70), (int) (y + 30), cardBoundary);					
-				}
+				this.renderHorizontal((int)x, (int)y + 30, 50, cardBoundary, player.hand.getCards());
 			}
 		}
-		//Render the pot size
-		
+		//Render the pot size		
 		String potSize = renderList.getDrawString(RenderList.POT_SIZE);
 		if (potSize != null){
 			System.out.println("Potsize: " + potSize);
 			g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
+		}
+	}
+	
+	public <T extends IRenderable> void renderHorizontal(int x, int y, int dx, Dimension boundary, Collection<T> renderables){
+		int i = 0;
+		for(T renderable : renderables){
+			try {
+				this.render(renderable, x + (i * dx), y, boundary);
+				i++;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 		

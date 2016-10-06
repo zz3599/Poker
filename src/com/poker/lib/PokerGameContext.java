@@ -135,6 +135,6 @@ public class PokerGameContext extends Observable {
 	}
 	
 	public RenderList getRenderList(){		
-		return new RenderList(this.communityCards, this.playerMap.values(), Integer.toString(potSize));	
+		return new RenderList(this.communityCards, new ArrayList<Player>(this.playerMap.values()), Integer.toString(potSize));	
 	}
 }
