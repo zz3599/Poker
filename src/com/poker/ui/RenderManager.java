@@ -71,12 +71,14 @@ public class RenderManager {
 			float ix = centerX + idx;
 			float iy = centerY + idy;
 			
+			// Render player cards
 			List<IRenderable> playerAtPosition = getSpritesAtTablePosition(position, players);
 			if (playerAtPosition.size() > 0){
 				Player player = (Player) playerAtPosition.get(0);
 				g.drawString(player.name, x, y);
 				this.renderHorizontal(g, (int)x, (int)y + 30, 50, cardBoundary, player.hand.getCards());
 			}
+			// Render dealer button, sb/bb, chips, etc.
 			List<IRenderable> spritesAtPosition = getSpritesAtTablePosition(position, sprites);
 			if(spritesAtPosition.size() > 0){
 				this.renderHorizontal(g, (int)ix, (int)iy, 0, playerBoundary, spritesAtPosition);
@@ -88,18 +90,6 @@ public class RenderManager {
 		if (potSize != null){
 			System.out.println("Potsize: " + potSize);
 			g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
-		}
-		
-		// Render various sprites
-		
-		if(sprites != null){
-			for(IRenderable sprite : sprites){
-				if (sprite instanceof TablePositionSprite){
-					// Find the location that matches the table position, and render it there.
-					int tablePosition = ((TablePositionSprite) sprite).getTablePosition();
-					
-				}
-			}
 		}
 	}
 	
