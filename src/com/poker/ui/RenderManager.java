@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,7 +16,9 @@ import javax.imageio.ImageIO;
 
 import com.poker.lib.IRenderable;
 import com.poker.lib.Player;
+import com.poker.lib.PokerGameContext;
 import com.poker.lib.RenderList;
+import com.poker.sprite.TablePositionSprite;
 import com.poker.utils.LRUCache;
 
 /**
@@ -26,25 +29,23 @@ public class RenderManager {
 	private static final int DEFAULT_CACHE_SIZE = 1000;
 	private static final Dimension cardBoundary = new Dimension(100, 100);
 	private static final Dimension playerBoundary = new Dimension(50, 50);
-	private Graphics2D g;
 	private Component c;
 	private LRUCache<String, ImageInfo> imageCache = new LRUCache<String, ImageInfo>(DEFAULT_CACHE_SIZE, true);
-	
-	
-	public RenderManager(Graphics g, Component c){
-		this.g = (Graphics2D)g;
-        this.g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
+		
+	public RenderManager(Component c){
 		this.c = c;
 	}
 	
-	public void render(RenderList renderList) throws IOException{
-		List<IRenderable> communityCards = renderList.getRenderList(RenderList.COMMUNITY_CARD_TYPE);
+	public void render(RenderList renderList, Graphics graphics) throws IOException{
+		Graphics2D g = (Graphics2D)graphics;
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+		List<? extends IRenderable> communityCards = renderList.getRenderList(RenderList.COMMUNITY_CARD_TYPE);
 		if (communityCards != null) {			
 			for (int i = 0; i < communityCards.size(); i++) {
 				IRenderable communityCard = communityCards.get(i);
 				System.out.println("Rendering: " + communityCard.getImageURL());
-				this.render(communityCard, i*100, 0, cardBoundary);				
+				this.render(g, communityCard, i*100, 0, cardBoundary);				
 				// Render list does not care about the actual content pane.
 				// Content pane should clear the contents
 			}
@@ -52,38 +53,89 @@ public class RenderManager {
 		// We draw the players in a circular fashion. Given a window width, width/2 is the radius.
 		int centerX = (int) (c.getWidth() * 0.4);
 		int centerY = (int) (c.getHeight() * 0.4);
+		int innerCenterX = (int) (centerX * 0.8);
+		int innerCenterY = (int) (centerY * 0.8);
+		// If we want a circular table, use the radius instead.
 		int radius = Math.min(centerX, centerY);
-		List<IRenderable> players = renderList.getRenderList(RenderList.PLAYER_TYPE);
-		if (players != null){
-			// Assuming the center of the size dimension is our circle's middle.
-			// Height ratio = sin(2*pi/# players), width ratio = cos(2*pi/# players).
-			// We can start at the actual location of (width/2, height), then rotate in such a fashion.
-			for(int i = 0; i < players.size(); i++){
-				Player player = (Player) players.get(i);
-				// For the first player, the dimensions come to (0,1). But we want to start at (0,-1)
-				float dx = (float)(Math.sin(2 * Math.PI * i / players.size())) * radius;
-				float dy = (float)(Math.cos(2 * Math.PI * i/ players.size()) * radius); 
-				
-				float x = centerX + dx;
-				float y = centerY + dy;
-				//Draw the names
+		List<? extends IRenderable> players = renderList.getRenderList(RenderList.PLAYER_TYPE);
+		// Match the sprites with the correct table position
+		List<? extends IRenderable> sprites = renderList.getSprites();
+		for(int position = 0; position < PokerGameContext.DEFAULT_GAME_SIZE; position++){
+			float dx = (float)(Math.sin(2 * Math.PI * position / PokerGameContext.DEFAULT_GAME_SIZE)) * centerX;
+			float dy = (float)(Math.cos(2 * Math.PI * position / PokerGameContext.DEFAULT_GAME_SIZE) * centerY); 
+			float x = centerX + dx;
+			float y = centerY + dy;
+			// The inner oval 
+			float idx = (float)(Math.sin(2 * Math.PI * position / PokerGameContext.DEFAULT_GAME_SIZE)) * innerCenterX;
+			float idy = (float)(Math.cos(2 * Math.PI * position / PokerGameContext.DEFAULT_GAME_SIZE) * innerCenterY);
+			float ix = centerX + idx;
+			float iy = centerY + idy;
+			
+			List<IRenderable> playerAtPosition = getSpritesAtTablePosition(position, players);
+			if (playerAtPosition.size() > 0){
+				Player player = (Player) playerAtPosition.get(0);
 				g.drawString(player.name, x, y);
-				this.renderHorizontal((int)x, (int)y + 30, 50, cardBoundary, player.hand.getCards());
+				this.renderHorizontal(g, (int)x, (int)y + 30, 50, cardBoundary, player.hand.getCards());
+			}
+			List<IRenderable> spritesAtPosition = getSpritesAtTablePosition(position, sprites);
+			if(spritesAtPosition.size() > 0){
+				this.renderHorizontal(g, (int)ix, (int)iy, 0, playerBoundary, spritesAtPosition);
 			}
 		}
+		
 		//Render the pot size		
 		String potSize = renderList.getDrawString(RenderList.POT_SIZE);
 		if (potSize != null){
 			System.out.println("Potsize: " + potSize);
 			g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
 		}
+		
+		// Render various sprites
+		
+		if(sprites != null){
+			for(IRenderable sprite : sprites){
+				if (sprite instanceof TablePositionSprite){
+					// Find the location that matches the table position, and render it there.
+					int tablePosition = ((TablePositionSprite) sprite).getTablePosition();
+					
+				}
+			}
+		}
 	}
 	
-	public <T extends IRenderable> void renderHorizontal(int x, int y, int dx, Dimension boundary, Collection<T> renderables){
+	private List<IRenderable> getSpritesAtTablePosition(int position, List<? extends IRenderable> spriteList){
+		List<IRenderable> result = new ArrayList<IRenderable>();
+		if (spriteList == null){
+			return result;
+		}
+		for(IRenderable sprite : spriteList){
+			if (!(sprite instanceof TablePositionSprite)){
+				continue;
+			}
+			if(((TablePositionSprite) sprite).getTablePosition() == position){
+				result.add(sprite);
+			}
+		}
+		return result;
+	}
+	
+	public <T extends IRenderable> void renderHorizontal(Graphics g, int x, int y, int dx, Dimension boundary, Collection<T> renderables){
 		int i = 0;
 		for(T renderable : renderables){
 			try {
-				this.render(renderable, x + (i * dx), y, boundary);
+				this.render(g, renderable, x + (i * dx), y, boundary);
+				i++;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public <T extends IRenderable> void renderVertical(Graphics g, int x, int y, int dy, Dimension boundary, Collection<T> renderables){
+		int i = 0;
+		for(T renderable : renderables){
+			try {
+				this.render(g, renderable, x, y + (i * dy), boundary);
 				i++;
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -91,7 +143,7 @@ public class RenderManager {
 		}
 	}
 		
-	private void render(IRenderable renderable, int x, int y, Dimension boundary) throws IOException{
+	private void render(Graphics g, IRenderable renderable, int x, int y, Dimension boundary) throws IOException{
 		if (renderable.getImageURL() == null || renderable.getImageURL().isEmpty()){
 			return;
 		}

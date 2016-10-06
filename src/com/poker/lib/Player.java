@@ -1,23 +1,31 @@
 package com.poker.lib;
 
 import com.poker.hand.Hand;
+import com.poker.sprite.TablePositionSprite;
 
-public class Player implements IRenderable {
+public class Player extends TablePositionSprite {
 	private static final String IMAGE_LOCATION = "res/board/";
+	public static int PLAYER_ID = 0;
 	public static final int DEFAULT_MONEY = 1000;
+	public int id;
 	public String name;
 	public Hand hand;
 	public int money;
 	public int betAmount;
 	/** By default false */
 	public boolean isDealer;
+	/** Blinds */
+	public boolean isBB;
+	public boolean isSB;
 	
-	public Player(String name) {
-		this(name, DEFAULT_MONEY);
+	public Player(String name, int id, int tablePosition) {
+		this(name, id, tablePosition, DEFAULT_MONEY);
 	}
 
-	public Player(String name, int money) {
+	private Player(String name, int id, int tablePosition, int money) {
+		super(tablePosition);
 		this.name = name;
+		this.id = id;
 		this.money = money;
 	}
 
@@ -39,7 +47,9 @@ public class Player implements IRenderable {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append("Player name: " + this.name);
-		result.append("Hand: " + this.hand);
+		result.append(",Hand: " + this.hand);
+		result.append(",TablePosition: " + this.tablePosition);
+		result.append(",PlayerId: " + this.id);
 		return result.toString();
 	}
 
@@ -62,10 +72,6 @@ public class Player implements IRenderable {
 
 	@Override
 	public String getImageURL() {
-		if(this.isDealer){
-			return IMAGE_LOCATION + "dealer.png";
-		}
 		return null;
 	}
-
 }

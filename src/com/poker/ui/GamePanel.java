@@ -11,17 +11,19 @@ import com.poker.lib.RenderList;
 
 public class GamePanel extends JPanel {
 	private GameEngine engine;
+	private RenderManager renderManager;
 	
 	public GamePanel(LayoutManager layout, GameEngine engine){
 		super(layout);
 		this.engine = engine;
+		this.renderManager = new RenderManager(this);
 	}
 	
 	public void paintComponent(Graphics g){
-		RenderManager renderManager = new RenderManager(g, this);
+		
 		RenderList renderList = this.engine.getStateManager().getCurrentState().getRenderList();
 		try {
-			renderManager.render(renderList);			
+			renderManager.render(renderList, g);			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

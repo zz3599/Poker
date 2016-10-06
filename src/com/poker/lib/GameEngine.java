@@ -21,14 +21,12 @@ import com.poker.state.StartRoundState;
 import com.poker.state.TurnState;
 import com.poker.state.statemanager.PokerGameStateManager;
 import com.poker.ui.PokerFrame;
-import com.poker.ui.RenderManager;
 
 public class GameEngine implements Runnable {
 	private static final int SLEEP_INTERVAL_MS = 500;
 	private PokerGameStateManager stateManager;
 	private PokerGameContext context;
 	private PokerFrame frame;
-	private RenderManager renderManager;
 	
 	public GameEngine() {
 		/**
@@ -67,7 +65,6 @@ public class GameEngine implements Runnable {
 				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);		
 		this.frame = new PokerFrame(this);
 		JPanel gamePanel = frame.getPokerPanel().getGamePanel();
-		this.renderManager = new RenderManager(gamePanel.getGraphics(), gamePanel);
 		this.stateManager.addObserver(this.frame.getPokerPanel());		
 	}
 
