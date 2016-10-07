@@ -29,7 +29,7 @@ public class StartRoundState extends AbstractPokerGameState{
 	 */
 	@Override
 	public void revealed() {
-		this.context.startRound();		
+		this.context.startRound();
 	}
 	
 	@Override

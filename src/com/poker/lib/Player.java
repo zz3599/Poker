@@ -11,7 +11,9 @@ public class Player extends TablePositionSprite {
 	public String name;
 	public Hand hand;
 	public int money;
+	/** Have a betAmount, also can be folded */
 	public int betAmount;
+	public boolean folded;
 	/** By default false */
 	public boolean isDealer;
 	/** Blinds */
@@ -27,6 +29,10 @@ public class Player extends TablePositionSprite {
 		this.name = name;
 		this.id = id;
 		this.money = money;
+		// This will be reset to 0 when the round is complete.
+		this.betAmount = 0;
+		// Will be reset to false when the round is complete.
+		this.folded = false;
 	}
 
 	public void dealHand(Hand hand) {
@@ -37,13 +43,37 @@ public class Player extends TablePositionSprite {
 		this.hand = null;
 	}
 
-	public void addMoney(int amt) {
-		this.money += amt;
-		if (money < 0) {
-			money = 0;
+	/**
+	 * Returns the total money actually bet.
+	 * @param amt The amount we want to bet.
+	 * @return The actual amount bet.
+	 */
+	private int addMoney(int amt) {
+		int resultMoney = this.money + amt;
+		if (resultMoney < 0) {
+			resultMoney = 0;
 		}
+		int betAmount = this.money - resultMoney;
+		this.money = resultMoney;
+		return betAmount;
+	}
+	
+	public void bet(int amt){
+		this.betAmount += this.addMoney(-amt);
+	}	
+
+	public boolean isFolded() {
+		return folded;
 	}
 
+	public void setFolded(boolean folded) {
+		this.folded = folded;
+	}
+
+	public boolean isActed(){
+		return this.folded || this.betAmount > 0;
+	}
+	
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		result.append("Player name: " + this.name);

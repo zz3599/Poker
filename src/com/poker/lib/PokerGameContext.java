@@ -13,6 +13,10 @@ import com.poker.sprite.BlindsSprite;
 import com.poker.sprite.DealerSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
+/**
+ * Blindspolicy and gamestatemanager observes this.
+ *
+ */
 public class PokerGameContext extends Observable {
 	public static final Integer DEFAULT_GAME_SIZE = 10;
 	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
@@ -55,9 +59,15 @@ public class PokerGameContext extends Observable {
 		this.updateDealerAndBlinds();		
 	}
 
+	private void informObservers(Object e){
+		this.setChanged();
+		this.notifyObservers(e);
+	}
+	
 	public void startRound(){
 		this.deal();
 		this.collectAnte();
+		this.informObservers(GAMESTATE.PREFLOP_BET.name());
 	}
 	
 	public void endRound() {
@@ -84,6 +94,12 @@ public class PokerGameContext extends Observable {
 				smallBlindsSprite.getTablePosition(), false));
 	}
 	
+	/**
+	 * Get the index of player to the left (forwards=false), or to the right (forwards=true).
+	 * @param startIndex
+	 * @param forwards
+	 * @return
+	 */
 	private int getNextPlayerIndex(int startIndex, boolean forwards){
 		do {
 			if (forwards){
@@ -113,8 +129,8 @@ public class PokerGameContext extends Observable {
 		int smallBlindIndex = smallBlindsSprite.getTablePosition();
 		int bigBlindIndex = bigBlindsSprite.getTablePosition();
 		System.out.println("Dealer index: " + dealerSprite.getTablePosition() + ",Collecting blinds from " + smallBlindIndex + "," + bigBlindIndex);
-		this.playerMap.get(smallBlindIndex).addMoney(-blindsPolicy.getSmallBlind());
-		this.playerMap.get(bigBlindIndex).addMoney(-blindsPolicy.getBigBlind());
+		this.playerMap.get(smallBlindIndex).bet(blindsPolicy.getSmallBlind());
+		this.playerMap.get(bigBlindIndex).bet(blindsPolicy.getBigBlind());
 		this.potSize += blindsPolicy.getSmallBlind() + blindsPolicy.getBigBlind();
 	}
 
@@ -153,6 +169,42 @@ public class PokerGameContext extends Observable {
 			}
 		}
 		System.err.println("Unable to remove player (not found)" + name);
+	}
+	
+	public void betFlop(){
+		int startBetPosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);
+		this.betRound(startBetPosition);
+	}
+	private void betRound(int startTablePosition){
+		do {
+			if(playerMap.get(startTablePosition) == null) continue;
+			
+			
+		} while(!isBettingDone());
+	}
+	
+	private boolean isBettingDone(){
+		// All players must have the same amount betted in order for betting to be done.
+		int tableBetAmount = -1;
+		for(int i = 0; i < DEFAULT_GAME_SIZE; i++){
+			if(this.playerMap.get(i) == null){
+				// Skip if there is no player at the seat.
+				continue;
+			}
+			Player player = this.playerMap.get(i);
+			if(!player.isActed()){
+				return false;
+			}
+			int playerBet = player.betAmount;
+			if (tableBetAmount == -1){
+				tableBetAmount = playerBet;
+			} else {
+				if (playerBet != tableBetAmount){
+					return false;
+				}
+			}			
+		}
+		return true;
 	}
 	
 	public RenderList getRenderList(){		

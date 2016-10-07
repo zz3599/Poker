@@ -62,9 +62,11 @@ public class GameEngine implements Runnable {
 						GAMESTATE.RIVER)
 				.addTransition(GAMESTATE.RIVER, GAMESTATE.POSTRIVER_BET)
 				.addTransition(GAMESTATE.POSTRIVER_BET, GAMESTATE.ENDROUND)
-				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);		
+				.addTransition(GAMESTATE.ENDROUND, GAMESTATE.STARTROUND);
+		// State manager will transition if certain events happen in the context.
+		this.context.addObserver(this.getStateManager());
 		this.frame = new PokerFrame(this);
-		JPanel gamePanel = frame.getPokerPanel().getGamePanel();
+		// The poker panel will render when there are state transitions to the state manager 
 		this.stateManager.addObserver(this.frame.getPokerPanel());		
 	}
 

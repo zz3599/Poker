@@ -10,17 +10,18 @@ import java.util.Observer;
 import java.util.Set;
 import java.util.Stack;
 
-import com.engine.EngineException;
 import com.engine.state.IStateManager;
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
+
 /**
  * Refer to http://www.pokerlistings.com/poker-rules-texas-holdem.
  * Maps from enum->pokerstate class containing game context object.
- * Calling advanceState also calls the corresponding targetState's revealed method. 
+ * Calling advanceState also calls the corresponding targetState's revealed method.
+ * This is observed by the gamepanel, which renders based on state changes. 
  */
-public class PokerGameStateManager extends Observable implements IStateManager<AbstractPokerGameState, GAMESTATE> {
+public class PokerGameStateManager extends Observable implements IStateManager<AbstractPokerGameState, GAMESTATE>, Observer {
 	private Map<GAMESTATE, AbstractPokerGameState> stateMap = new HashMap<GAMESTATE, AbstractPokerGameState>();
 	/** Top of the stack is the currentstate */
 	private Stack<GAMESTATE> stateStack = new Stack<GAMESTATE>();
@@ -82,6 +83,10 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 	
 	@Override
 	public synchronized void advanceState(GAMESTATE nextState) {
+		if (nextState == this.currentState.getGameState()){
+			System.out.println("Already at state " + nextState);
+			return;
+		}
 		if (this.stateTransitions.get(this.currentState.getGameState()).contains(nextState)){
 			// Update current state
 			this.currentState.obscuring();
@@ -108,5 +113,19 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 			this.currentState = null;
 		}
 		return poppedState;
+	}
+
+	@Override
+	public void update(Observable arg0, Object e) {
+		if (e instanceof String){
+			// Proceed to the state the observable notified us with.
+			String s = (String) e;
+			for(GAMESTATE state : GAMESTATE.values()){
+				if (s.equalsIgnoreCase(state.name())){
+					this.advanceState(state);
+				}
+			}				
+		}
+		
 	}
 }

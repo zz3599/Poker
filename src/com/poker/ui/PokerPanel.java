@@ -72,6 +72,7 @@ public class PokerPanel extends JPanel implements Observer{
 		
 		this.loadingLabel.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.MENU));
 		
+		this.betButton.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.PREFLOP_BET));
 	}
 
 	/**
@@ -99,12 +100,13 @@ public class PokerPanel extends JPanel implements Observer{
 			this.gamePanel.add(exitMenuButton, BorderLayout.SOUTH);
 			break;
 		case STARTROUND:
+		case PREFLOP_BET:
 			this.gamePanel.removeAll();
 			this.actionPanel.add(betButton);
 			this.actionPanel.add(betSlider);
 			this.actionPanel.add(checkButton);
 			this.actionPanel.add(foldButton);
-			break;
+			break;			
 		}
 		this.revalidate();
 	}
