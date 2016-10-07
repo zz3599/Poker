@@ -1,6 +1,7 @@
 package com.poker.state;
 
 import com.poker.lib.PokerGameContext;
+import com.poker.lib.RenderList;
 
 public class FlopState extends AbstractPokerGameState {
 	public FlopState(PokerGameContext context) {
@@ -31,6 +32,10 @@ public class FlopState extends AbstractPokerGameState {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+	}
+	
+	@Override
+	public RenderList getRenderList(){
+		return context.getRenderList();
 	}
 }

@@ -40,16 +40,7 @@ public class RenderManager {
 		Graphics2D g = (Graphics2D)graphics;
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-		List<? extends IRenderable> communityCards = renderList.getRenderList(RenderList.COMMUNITY_CARD_TYPE);
-		if (communityCards != null) {			
-			for (int i = 0; i < communityCards.size(); i++) {
-				IRenderable communityCard = communityCards.get(i);
-				System.out.println("Rendering: " + communityCard.getImageURL());
-				this.render(g, communityCard, i*100, 0, cardBoundary);				
-				// Render list does not care about the actual content pane.
-				// Content pane should clear the contents
-			}
-		}
+
 		// We draw the players in a circular fashion. Given a window width, width/2 is the radius.
 		int centerX = (int) (c.getWidth() * 0.4);
 		int centerY = (int) (c.getHeight() * 0.4);
@@ -85,6 +76,14 @@ public class RenderManager {
 			}
 		}
 		
+		// Render community cards
+		List<? extends IRenderable> communityCards = renderList.getRenderList(RenderList.COMMUNITY_CARD_TYPE);
+		if (communityCards != null) {			
+			for (int i = 0; i < communityCards.size(); i++) {
+				IRenderable communityCard = communityCards.get(i);				
+				this.render(g, communityCard, centerX + i*100, centerY, cardBoundary);				
+			}
+		}
 		//Render the pot size		
 		String potSize = renderList.getDrawString(RenderList.POT_SIZE);
 		if (potSize != null){

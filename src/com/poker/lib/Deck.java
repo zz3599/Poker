@@ -74,6 +74,9 @@ public class Deck {
 	
 	public void reset(){
 		Arrays.fill(dealtCards, false);
+		for(Card card : cards){
+			card.revealed = true;
+		}
 	}
 }
  

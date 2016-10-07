@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Observable;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.poker.exception.PokerException;
 import com.poker.sprite.BlindsSprite;
@@ -18,6 +22,7 @@ import com.poker.state.AbstractPokerGameState.GAMESTATE;
  *
  */
 public class PokerGameContext extends Observable {
+	private static final Random RANDOM = new Random();
 	public static final Integer DEFAULT_GAME_SIZE = 10;
 	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
 			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris",
@@ -25,7 +30,7 @@ public class PokerGameContext extends Observable {
 	public final List<Card> communityCards;
 	
 	public int potSize;
-	
+	public int maxBet;
 	public final Deck deck;
 	/** Seat index -> player */
 	public final Map<Integer, Player> playerMap;
@@ -39,6 +44,9 @@ public class PokerGameContext extends Observable {
 	private BlindsSprite bigBlindsSprite;
 	private BlindsSprite smallBlindsSprite;
 	
+	/** Scheduler service */
+	private ScheduledExecutorService exec = Executors.newScheduledThreadPool(10);
+	
 	private BlindsPolicy blindsPolicy;
 
 	public PokerGameContext() {
@@ -47,13 +55,17 @@ public class PokerGameContext extends Observable {
 		this.occupiedSeats = new boolean[DEFAULT_GAME_SIZE];
 		this.playerMap = new LinkedHashMap<Integer, Player>();
 		this.potSize = 0;
+		this.maxBet = 0;
 		this.blindsPolicy = new BlindsPolicy(100, 200, 100, 1);
 		this.bigBlindsSprite = new BlindsSprite(-1, true, blindsPolicy.getBigBlind());
 		this.smallBlindsSprite = new BlindsSprite(-1, false, blindsPolicy.getSmallBlind());
 		// Player id != table position key in playerMap
 		for(int i = 0; i < DEFAULT_PLAYER_NAMES.length; i++){
 			// i is the table position.
-			this.addPlayer(new Player(DEFAULT_PLAYER_NAMES[i], Player.PLAYER_ID++, i));
+			Player newPlayer = new Player(DEFAULT_PLAYER_NAMES[i], Player.PLAYER_ID++, i);
+			this.addPlayer(newPlayer);
+			// The players will reset when the round is ended.
+			this.addObserver(newPlayer);
 		}
 		
 		this.updateDealerAndBlinds();		
@@ -67,7 +79,12 @@ public class PokerGameContext extends Observable {
 	public void startRound(){
 		this.deal();
 		this.collectAnte();
-		this.informObservers(GAMESTATE.PREFLOP_BET.name());
+		informObservers(GAMESTATE.PREFLOP_BET.name());
+//		exec.schedule(new Runnable(){
+//			@Override
+//			public void run() {
+//				informObservers(GAMESTATE.PREFLOP_BET.name());				
+//			}}, 2, TimeUnit.SECONDS);		
 	}
 	
 	public void endRound() {
@@ -77,9 +94,9 @@ public class PokerGameContext extends Observable {
 		this.deck.reset();
 		this.communityCards.clear();
 		this.potSize = 0;
+		this.maxBet = 0;
 		this.updateDealerAndBlinds();
-		this.setChanged();
-		this.notifyObservers(GAMESTATE.ENDROUND.toString());
+		this.informObservers(GAMESTATE.ENDROUND.name());
 		//TODO: give the money to somebody
 	}
 	
@@ -91,7 +108,7 @@ public class PokerGameContext extends Observable {
 		this.smallBlindsSprite.setTablePosition(this.getNextPlayerIndex(
 				dealerSprite.getTablePosition(), false));
 		this.bigBlindsSprite.setTablePosition(this.getNextPlayerIndex(
-				smallBlindsSprite.getTablePosition(), false));
+				smallBlindsSprite.getTablePosition(), false));		
 	}
 	
 	/**
@@ -132,6 +149,8 @@ public class PokerGameContext extends Observable {
 		this.playerMap.get(smallBlindIndex).bet(blindsPolicy.getSmallBlind());
 		this.playerMap.get(bigBlindIndex).bet(blindsPolicy.getBigBlind());
 		this.potSize += blindsPolicy.getSmallBlind() + blindsPolicy.getBigBlind();
+		// Set the max bet
+		this.maxBet = blindsPolicy.getBigBlind();
 	}
 
 	public List<Card> flop() throws PokerException{
@@ -171,16 +190,47 @@ public class PokerGameContext extends Observable {
 		System.err.println("Unable to remove player (not found)" + name);
 	}
 	
-	public void betFlop(){
+	public void betPreFlop(){
 		int startBetPosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);
-		this.betRound(startBetPosition);
+		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
 	}
-	private void betRound(int startTablePosition){
-		do {
-			if(playerMap.get(startTablePosition) == null) continue;
-			
-			
-		} while(!isBettingDone());
+	
+	public void betPostFlop(){
+		int startBetPosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);
+		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
+	}
+	
+	private void betRound(int startTablePosition, GAMESTATE initialState, GAMESTATE finalState){
+		exec.submit(new Runnable(){
+			@Override
+			public void run() {
+				int tablePosition = startTablePosition;
+				do {
+					if(playerMap.get(tablePosition) == null) continue;
+					Player player = playerMap.get(tablePosition);
+					// Randomize for now. TODO: add decision making to the AI.
+					int decision = RANDOM.nextInt(2);
+					if (decision == 0){
+						// Target amount is maxBet. We need to bet maxBet-currentBet to get there.
+						int betAmount = maxBet - player.betAmount;
+						player.bet(betAmount);
+						potSize += betAmount;
+					} else {
+						player.setFolded(true);
+					}
+					// This will trigger a repaint
+					informObservers(initialState.name());
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					tablePosition = getNextPlayerIndex(tablePosition, false);			
+				} while(!isBettingDone());
+				System.out.println("Done betting from " + initialState + " to " + finalState);
+				informObservers(finalState.name());				
+			}});
 	}
 	
 	private boolean isBettingDone(){
@@ -192,6 +242,10 @@ public class PokerGameContext extends Observable {
 				continue;
 			}
 			Player player = this.playerMap.get(i);
+			// Ignore folded players.
+			if(!player.isActive()){
+				continue;
+			}
 			if(!player.isActed()){
 				return false;
 			}

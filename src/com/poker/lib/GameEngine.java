@@ -78,16 +78,16 @@ public class GameEngine implements Runnable {
 	public void run() {
 		// 1. Process events from the UI -> change state, context, etc.
 		// 2. Render the current state.
-		while(true){			
-			try {
-				// Repaint the UI when there are changes needed							
-				// Render game contents
-				frame.getPokerPanel().repaint();				
-				Thread.sleep(SLEEP_INTERVAL_MS);				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+//		while(true){			
+//			try {
+//				// Repaint the UI when there are changes needed							
+//				// Render game contents
+//				frame.getPokerPanel().repaint();				
+//				Thread.sleep(SLEEP_INTERVAL_MS);				
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 

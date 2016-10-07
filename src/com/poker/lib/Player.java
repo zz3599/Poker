@@ -1,9 +1,13 @@
 package com.poker.lib;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import com.poker.hand.Hand;
 import com.poker.sprite.TablePositionSprite;
+import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
-public class Player extends TablePositionSprite {
+public class Player extends TablePositionSprite implements Observer {
 	private static final String IMAGE_LOCATION = "res/board/";
 	public static int PLAYER_ID = 0;
 	public static final int DEFAULT_MONEY = 1000;
@@ -58,7 +62,7 @@ public class Player extends TablePositionSprite {
 		return betAmount;
 	}
 	
-	public void bet(int amt){
+	public void bet(int amt){		
 		this.betAmount += this.addMoney(-amt);
 	}	
 
@@ -68,10 +72,29 @@ public class Player extends TablePositionSprite {
 
 	public void setFolded(boolean folded) {
 		this.folded = folded;
+		// Don't reveal folded cards.
+		if (folded){
+			for(Card card : hand.getCards()){
+				card.revealed = false;
+			}
+		}
 	}
 
+	/**
+	 * Returns whether the player has already acted.
+	 * AKA if he folded or has bet.
+	 * @return
+	 */
 	public boolean isActed(){
 		return this.folded || this.betAmount > 0;
+	}
+	
+	/**
+	 * Returns the player is still active for the round.
+	 * @return
+	 */
+	public boolean isActive(){
+		return !this.folded;
 	}
 	
 	public String toString() {
@@ -103,5 +126,18 @@ public class Player extends TablePositionSprite {
 	@Override
 	public String getImageURL() {
 		return null;
+	}
+
+	@Override
+	public void update(Observable arg0, Object e) {
+		if (e instanceof String){
+			String event = (String) e;
+			if(event.equalsIgnoreCase(GAMESTATE.ENDROUND.name())){
+				// At the end of the round, we reset our state and bet amounts.
+				this.folded = false;
+				this.betAmount = 0;				
+			}
+		}
+		
 	}
 }

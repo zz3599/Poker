@@ -77,7 +77,7 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 	}
 	
 	@Override
-	public AbstractPokerGameState getCurrentState(){
+	public synchronized AbstractPokerGameState getCurrentState(){
 		return this.currentState;
 	}
 	
@@ -85,6 +85,7 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 	public synchronized void advanceState(GAMESTATE nextState) {
 		if (nextState == this.currentState.getGameState()){
 			System.out.println("Already at state " + nextState);
+			this.informListeners();
 			return;
 		}
 		if (this.stateTransitions.get(this.currentState.getGameState()).contains(nextState)){
@@ -95,9 +96,7 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 			System.out.println("Transitioning to " + currentState.getName());
 			// Push to stack
 			this.stateStack.push(nextState);
-			// Update observers
-			this.setChanged();
-			this.notifyObservers();
+			this.informListeners();
 		} else {
 			System.err.println("Invalid target state: " + nextState);
 		}
@@ -115,6 +114,12 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 		return poppedState;
 	}
 
+	private void informListeners(){
+		// Update observers
+		this.setChanged();
+		this.notifyObservers();
+	}
+	
 	@Override
 	public void update(Observable arg0, Object e) {
 		if (e instanceof String){
@@ -122,7 +127,9 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 			String s = (String) e;
 			for(GAMESTATE state : GAMESTATE.values()){
 				if (s.equalsIgnoreCase(state.name())){
+					System.out.println("State manager received event " + e.toString());
 					this.advanceState(state);
+					break;
 				}
 			}				
 		}

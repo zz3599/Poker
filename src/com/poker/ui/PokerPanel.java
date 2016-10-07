@@ -41,7 +41,7 @@ public class PokerPanel extends JPanel implements Observer{
 	
 	private JButton betButton = new JButton("Bet");
 	private JSlider betSlider = new JSlider();
-	private JButton checkButton = new JButton("Check");
+	private JButton checkOrCallButton = new JButton("Check");
 	private JButton foldButton = new JButton("Fold");
 	
 	
@@ -101,10 +101,11 @@ public class PokerPanel extends JPanel implements Observer{
 			break;
 		case STARTROUND:
 		case PREFLOP_BET:
+		case FLOP:
 			this.gamePanel.removeAll();
 			this.actionPanel.add(betButton);
 			this.actionPanel.add(betSlider);
-			this.actionPanel.add(checkButton);
+			this.actionPanel.add(checkOrCallButton);
 			this.actionPanel.add(foldButton);
 			break;			
 		}

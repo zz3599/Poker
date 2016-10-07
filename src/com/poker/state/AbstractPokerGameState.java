@@ -38,7 +38,7 @@ public abstract class AbstractPokerGameState implements IState{
 	
 	/**
 	 * Since the states are aware of what objects should be rendered, the responsibility lies with the states themselves.
-	 * @return
+	 * @return By default, empty, since we don't want to render stuff at the beginning.
 	 */
 	public RenderList getRenderList(){
 		return new RenderList();
