@@ -44,6 +44,9 @@ public class PokerGameContext extends Observable {
 	private BlindsSprite bigBlindsSprite;
 	private BlindsSprite smallBlindsSprite;
 	
+	/** At any given time, only one position is active */
+	private int activeTablePosition;
+	
 	/** Scheduler service */
 	private ScheduledExecutorService exec = Executors.newScheduledThreadPool(10);
 	
@@ -201,7 +204,8 @@ public class PokerGameContext extends Observable {
 	}
 	
 	private void betRound(int startTablePosition, GAMESTATE initialState, GAMESTATE finalState){
-		exec.submit(new Runnable(){
+		// This has to go in a separate thread - these updates cannot happen synchronously;
+		new Thread(new Runnable(){
 			@Override
 			public void run() {
 				int tablePosition = startTablePosition;
@@ -221,16 +225,16 @@ public class PokerGameContext extends Observable {
 					// This will trigger a repaint
 					informObservers(initialState.name());
 					try {
-						Thread.sleep(2000);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					activeTablePosition = tablePosition;
 					tablePosition = getNextPlayerIndex(tablePosition, false);			
 				} while(!isBettingDone());
 				System.out.println("Done betting from " + initialState + " to " + finalState);
 				informObservers(finalState.name());				
-			}});
+			}}).start();
 	}
 	
 	private boolean isBettingDone(){
@@ -259,8 +263,12 @@ public class PokerGameContext extends Observable {
 			}			
 		}
 		return true;
-	}
+	}	
 	
+	public int getActiveTablePosition() {
+		return activeTablePosition;
+	}
+
 	public RenderList getRenderList(){		
 		return new RenderList(
 				this.communityCards, 

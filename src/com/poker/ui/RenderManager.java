@@ -67,6 +67,7 @@ public class RenderManager {
 			if (playerAtPosition.size() > 0){
 				Player player = (Player) playerAtPosition.get(0);
 				g.drawString(player.name, x, y);
+				
 				this.renderHorizontal(g, (int)x, (int)y + 30, 50, cardBoundary, player.hand.getCards());
 			}
 			// Render dealer button, sb/bb, chips, etc.
