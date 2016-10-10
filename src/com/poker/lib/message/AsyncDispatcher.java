@@ -4,20 +4,14 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class AsyncDispatcher {
 	// Default context queue's sleepTime
 	public static final long DEFAULT_POLL_RATE = 1000;
 	// Each context's queue size.
 	private static final int DEFAULT_QUEUE_SIZE = 100;
-	// Total threads scheduled in the executor service.
-	private static final int DEFAULT_EXECUTOR_POOL_SIZE = 1000;
 
 	int size;
-	ScheduledExecutorService exec;
 	Map<Class, BlockingQueue<Runnable>> queueMap;
 	Map<Class, Thread> monitoringThreadMap;
 	Map<Class, Long> pollRateMap;
@@ -38,8 +32,6 @@ public class AsyncDispatcher {
 	 */
 	private AsyncDispatcher(int size) {
 		this.size = size;
-		this.exec = Executors
-				.newScheduledThreadPool(DEFAULT_EXECUTOR_POOL_SIZE);
 		/** There can be multiple updates to this coming from multiple sources */
 		this.queueMap = new ConcurrentHashMap<Class, BlockingQueue<Runnable>>();
 		this.monitoringThreadMap = new ConcurrentHashMap<Class, Thread>();
@@ -65,8 +57,7 @@ public class AsyncDispatcher {
 						try {
 							Runnable task = queueMap.get(context).poll();
 							if (task != null) {
-								exec.schedule(task, pollRateMap.get(context),
-										TimeUnit.MILLISECONDS);
+								task.run();								
 							}
 							// Then sleep
 							Thread.sleep(pollRateMap.get(context));
