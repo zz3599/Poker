@@ -79,15 +79,10 @@ public class PokerGameContext extends Observable {
 		this.notifyObservers(e);
 	}
 	
-	public void startRound(){
-		this.deal();
+	public void startRound(){		
 		this.collectAnte();
-		informObservers(GAMESTATE.PREFLOP_BET.name());
-//		exec.schedule(new Runnable(){
-//			@Override
-//			public void run() {
-//				informObservers(GAMESTATE.PREFLOP_BET.name());				
-//			}}, 2, TimeUnit.SECONDS);		
+		this.deal();
+		
 	}
 	
 	public void endRound() {
@@ -134,15 +129,21 @@ public class PokerGameContext extends Observable {
 
 	
 	private void deal() {
-		try {
-			this.deck.shuffle();
-			this.deck.deal(this.playerMap.values());
-			for (Entry entry : this.playerMap.entrySet()) {
-				System.out.println(entry.getValue());
-			}
-		} catch (PokerException e) {
-			System.out.println(e);
-		}
+		new Thread(new Runnable(){
+			@Override
+			public void run() {
+				try {
+					deck.shuffle();
+					deck.deal(playerMap.values());
+					for (Entry entry : playerMap.entrySet()) {
+						System.out.println(entry.getValue());
+					}
+					informObservers(GAMESTATE.PREFLOP_BET.name());					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}				
+			}}).start();
+
 	}
 	
 	private void collectAnte(){

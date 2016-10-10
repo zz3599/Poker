@@ -1,4 +1,4 @@
-package com.poker.lib;
+package com.poker.lib.message;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
