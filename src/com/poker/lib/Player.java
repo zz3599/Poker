@@ -39,7 +39,7 @@ public class Player extends TablePositionSprite implements Observer {
 		this.folded = false;
 	}
 
-	public void dealHand(Hand hand) {
+	public void setHand(Hand hand) {
 		this.hand = hand;
 	}
 

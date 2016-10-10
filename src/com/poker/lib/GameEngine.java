@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
+import com.poker.lib.message.AsyncDispatcher;
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 import com.poker.state.EndRoundState;
@@ -24,16 +24,19 @@ import com.poker.ui.PokerFrame;
 
 public class GameEngine implements Runnable {
 	private static final int SLEEP_INTERVAL_MS = 500;
+	
 	private PokerGameStateManager stateManager;
 	private PokerGameContext context;
 	private PokerFrame frame;
+	private AsyncDispatcher asyncDispatcher;
 	
-	public GameEngine() {
+	public GameEngine() {		
 		/**
 		 * TODO: this engine should populate a list of generic Istatemanagers,
 		 * update the transitions at every tick based on user input/events
 		 * http://blog.nuclex-games.com/tutorials/cxx/game-state-management/
 		 */
+		
 		this.context = new PokerGameContext();
 
 		AbstractPokerGameState startState = new StartGameState(context);

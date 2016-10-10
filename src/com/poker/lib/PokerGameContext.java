@@ -13,6 +13,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.poker.exception.PokerException;
+import com.poker.lib.message.AsyncDispatcher;
+import com.poker.lib.message.GameStateObservableMessage;
 import com.poker.sprite.BlindsSprite;
 import com.poker.sprite.DealerSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
@@ -71,9 +73,15 @@ public class PokerGameContext extends Observable {
 			this.addObserver(newPlayer);
 		}
 		
+		// Create the async queue
+		AsyncDispatcher.getInstance().createContextQueue(this.getClass(), 250);
 		this.updateDealerAndBlinds();		
 	}
 
+	/**
+	 * This will trigger a notification to all observers, including state manager, which in turn will trigger a render.
+	 * @param e
+	 */
 	private void informObservers(Object e){
 		this.setChanged();
 		this.notifyObservers(e);
@@ -81,8 +89,7 @@ public class PokerGameContext extends Observable {
 	
 	public void startRound(){		
 		this.collectAnte();
-		this.deal();
-		
+		this.deal();		
 	}
 	
 	public void endRound() {
@@ -94,7 +101,8 @@ public class PokerGameContext extends Observable {
 		this.potSize = 0;
 		this.maxBet = 0;
 		this.updateDealerAndBlinds();
-		this.informObservers(GAMESTATE.ENDROUND.name());
+		this.informObservers(new GameStateObservableMessage(GAMESTATE.ENDROUND,
+				GAMESTATE.ENDROUND.name()));
 		//TODO: give the money to somebody
 	}
 	
@@ -129,21 +137,31 @@ public class PokerGameContext extends Observable {
 
 	
 	private void deal() {
-		new Thread(new Runnable(){
-			@Override
-			public void run() {
-				try {
-					deck.shuffle();
-					deck.deal(playerMap.values());
-					for (Entry entry : playerMap.entrySet()) {
-						System.out.println(entry.getValue());
+		deck.shuffle();
+		int i = 0;
+		for (Iterator<Player> it = playerMap.values().iterator(); it.hasNext(); i++) {
+			Player player = it.next();
+			final int playerIndex = i;
+			AsyncDispatcher.getInstance().schedule(this.getClass(), new Runnable() {
+				@Override
+				public void run() {
+					try {
+						deck.deal(player, playerMap.size());
+						// Trigger a render
+						informObservers(new GameStateObservableMessage(
+								GAMESTATE.STARTROUND, GAMESTATE.STARTROUND
+										.name()));
+						// If the last player, trigger state transition
+						if (playerIndex == (playerMap.values().size()-1)){
+							informObservers(new GameStateObservableMessage(GAMESTATE.PREFLOP_BET,
+									GAMESTATE.PREFLOP_BET.name()));
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					informObservers(GAMESTATE.PREFLOP_BET.name());					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}				
-			}}).start();
-
+				}
+			});
+		}		
 	}
 	
 	private void collectAnte(){
@@ -200,7 +218,7 @@ public class PokerGameContext extends Observable {
 	}
 	
 	public void betPostFlop(){
-		int startBetPosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);
+		int startBetPosition = this.getNextPlayerIndex(dealerSprite.getTablePosition(), false);
 		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
 	}
 	
@@ -211,7 +229,6 @@ public class PokerGameContext extends Observable {
 			public void run() {
 				int tablePosition = startTablePosition;
 				do {
-					if(playerMap.get(tablePosition) == null) continue;
 					Player player = playerMap.get(tablePosition);
 					// Randomize for now. TODO: add decision making to the AI.
 					int decision = RANDOM.nextInt(2);
@@ -224,7 +241,7 @@ public class PokerGameContext extends Observable {
 						player.setFolded(true);
 					}
 					// This will trigger a repaint
-					informObservers(initialState.name());
+					informObservers(new GameStateObservableMessage(initialState, initialState.name()));
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException e) {
@@ -234,7 +251,7 @@ public class PokerGameContext extends Observable {
 					tablePosition = getNextPlayerIndex(tablePosition, false);			
 				} while(!isBettingDone());
 				System.out.println("Done betting from " + initialState + " to " + finalState);
-				informObservers(finalState.name());				
+				informObservers(new GameStateObservableMessage(finalState, finalState.name()));				
 			}}).start();
 	}
 	

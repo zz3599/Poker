@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import com.engine.state.IStateManager;
+import com.poker.lib.message.GameStateObservableMessage;
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
@@ -122,12 +123,12 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 	
 	@Override
 	public void update(Observable arg0, Object e) {
-		if (e instanceof String){
+		if (e instanceof GameStateObservableMessage){
 			// Proceed to the state the observable notified us with.
-			String s = (String) e;
+			GameStateObservableMessage msg = (GameStateObservableMessage) e;
 			for(GAMESTATE state : GAMESTATE.values()){
-				if (s.equalsIgnoreCase(state.name())){
-					System.out.println("State manager received event " + e.toString());
+				if (msg.getTargetState() == state){
+					System.out.println("State manager received event " + msg.getTargetState());
 					this.advanceState(state);
 					break;
 				}

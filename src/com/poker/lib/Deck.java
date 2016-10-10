@@ -47,16 +47,24 @@ public class Deck {
 	
 	public void deal(Collection<Player> players) throws PokerException {
 		int offset = players.size();
-		int i = 0;
 		for(Player player : players){
-			if (this.dealtCards[i] || this.dealtCards[i + offset]){
-				throw new PokerException("Cards for player " + player.name + " are already dealt at " + i + ", " + (i + offset), ErrorCode.DECK_EMPTY);
+			this.deal(player, offset);			
+		}
+	}
+	
+	public void deal(Player player, int numPlayers) throws PokerException {
+		for(int i = 0; i < dealtCards.length; i++){
+			if(dealtCards[i]){
+				continue;
 			}
-			Hand hand = new Hand(this.cards[i], this.cards[i + offset]);
-			player.dealHand(hand);
-			this.dealtCards[i] = true;
-			this.dealtCards[i + offset] = true;
-			i++;
+			if (this.dealtCards[i] || this.dealtCards[i + numPlayers]){
+				throw new PokerException("Cards for player " + player.name + " are already dealt at " + i + ", " + (i + numPlayers), ErrorCode.DECK_EMPTY);
+			}
+			Hand hand = new Hand(this.cards[i], this.cards[i + numPlayers]);
+			player.setHand(hand);
+			dealtCards[i] = true;
+			dealtCards[i + numPlayers] = true;
+			return;			
 		}
 	}
 	
