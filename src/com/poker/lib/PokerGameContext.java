@@ -5,12 +5,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import com.poker.exception.PokerException;
 import com.poker.lib.message.AsyncDispatcher;
@@ -28,7 +26,10 @@ public class PokerGameContext extends Observable {
 	public static final Integer DEFAULT_GAME_SIZE = 10;
 	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
 			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris",
-			"Ivana", "Joey" }; 
+			"Ivana", "Joey" };
+	/** The user's player id */
+	public final int playerId = 0;
+	
 	public final List<Card> communityCards;
 	
 	public int potSize;
@@ -38,8 +39,6 @@ public class PokerGameContext extends Observable {
 	public final Map<Integer, Player> playerMap;
 	/** Map to determine if the seats are occupied */
 	public final boolean[] occupiedSeats;
-	/** The user's player id */
-	public final int playerId = 0;
 	
 	/** The index of the dealer*/	
 	private DealerSprite dealerSprite = new DealerSprite(-1);
@@ -138,10 +137,9 @@ public class PokerGameContext extends Observable {
 	
 	private void deal() {
 		deck.shuffle();
-		int i = 0;
-		for (Iterator<Player> it = playerMap.values().iterator(); it.hasNext(); i++) {
-			Player player = it.next();
-			final int playerIndex = i;
+		int startDealingIndex = getNextPlayerIndex(dealerSprite.getTablePosition(), false);
+		for (int idx = startDealingIndex; ; idx = getNextPlayerIndex(idx, false)) {
+			Player player = playerMap.get(idx);
 			AsyncDispatcher.getInstance().schedule(this.getClass(), new Runnable() {
 				@Override
 				public void run() {
@@ -152,7 +150,7 @@ public class PokerGameContext extends Observable {
 								GAMESTATE.STARTROUND, GAMESTATE.STARTROUND
 										.name()));
 						// If the last player, trigger state transition
-						if (playerIndex == (playerMap.values().size()-1)){
+						if (doneDealing()){
 							informObservers(new GameStateObservableMessage(GAMESTATE.PREFLOP_BET,
 									GAMESTATE.PREFLOP_BET.name()));
 						}
@@ -161,7 +159,19 @@ public class PokerGameContext extends Observable {
 					}
 				}
 			});
+			if (idx == dealerSprite.getTablePosition()){
+				break;
+			}
 		}		
+	}
+	
+	private boolean doneDealing(){
+		for(Player player: playerMap.values()){
+			if(player.hand == null || player.hand.getCards().size() == 0){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private void collectAnte(){
@@ -230,16 +240,25 @@ public class PokerGameContext extends Observable {
 				int tablePosition = startTablePosition;
 				do {
 					Player player = playerMap.get(tablePosition);
-					// Randomize for now. TODO: add decision making to the AI.
-					int decision = RANDOM.nextInt(2);
-					if (decision == 0){
-						// Target amount is maxBet. We need to bet maxBet-currentBet to get there.
-						int betAmount = maxBet - player.betAmount;
-						player.bet(betAmount);
-						potSize += betAmount;
-					} else {
-						player.setFolded(true);
-					}
+//					if (player.id == playerId){
+//						//wait for the user input
+//						try {
+//							Thread.sleep(100);
+//						} catch (InterruptedException e) {
+//							e.printStackTrace();
+//						}
+//					} else {
+						// Randomize AI for now. TODO: add decision making to the AI.
+						int decision = RANDOM.nextInt(2);
+						if (decision == 0){
+							// Target amount is maxBet. We need to bet maxBet-currentBet to get there.
+							int betAmount = maxBet - player.betAmount;
+							player.bet(betAmount);
+							potSize += betAmount;
+						} else {
+							player.setFolded(true);
+						}
+					//}
 					// This will trigger a repaint
 					informObservers(new GameStateObservableMessage(initialState, initialState.name()));
 					try {
@@ -282,6 +301,10 @@ public class PokerGameContext extends Observable {
 		}
 		return true;
 	}	
+	
+	public Player getUserPlayer(){
+		return this.playerMap.get(0);
+	}
 	
 	public int getActiveTablePosition() {
 		return activeTablePosition;
