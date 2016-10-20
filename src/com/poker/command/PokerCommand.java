@@ -1,5 +1,7 @@
 package com.poker.command;
 
+import com.poker.lib.Player;
+import com.poker.lib.PokerGameContext;
 import com.poker.state.AbstractPokerGameState;
 
 /**
@@ -11,7 +13,15 @@ import com.poker.state.AbstractPokerGameState;
  * @see <a href="https://en.wikipedia.org/wiki/Command_pattern">Command pattern</a>
  * @see <a href="http://stackoverflow.com/a/558437/638127">Command pattern usage example</a>
  */
-public interface PokerCommand {
-	public boolean isLegal(AbstractPokerGameState gameState);
-	public void apply(AbstractPokerGameState gameState);
+public abstract class PokerCommand {
+	protected Player player;
+	protected PokerGameContext context;
+	
+	protected PokerCommand(Player player, PokerGameContext context){
+		this.player = player;
+		this.context = context;
+	}
+	
+	public abstract boolean isLegal(AbstractPokerGameState gameState);
+	public abstract void apply(AbstractPokerGameState gameState);	
 }

@@ -44,6 +44,8 @@ public class PokerGameContext extends Observable {
 	private DealerSprite dealerSprite = new DealerSprite(-1);
 	private BlindsSprite bigBlindsSprite;
 	private BlindsSprite smallBlindsSprite;
+	/** Single writer (bet thread), but multiple readers */
+	public volatile int currentActiveTablePosition = -1;
 	
 	/** At any given time, only one position is active */
 	private int activeTablePosition;
@@ -66,7 +68,7 @@ public class PokerGameContext extends Observable {
 		// Player id != table position key in playerMap
 		for(int i = 0; i < DEFAULT_PLAYER_NAMES.length; i++){
 			// i is the table position.
-			Player newPlayer = new Player(DEFAULT_PLAYER_NAMES[i], Player.PLAYER_ID++, i);
+			Player newPlayer = new Player(this, DEFAULT_PLAYER_NAMES[i], Player.PLAYER_ID++, i);
 			this.addPlayer(newPlayer);
 			// The players will reset when the round is ended.
 			this.addObserver(newPlayer);
@@ -117,7 +119,8 @@ public class PokerGameContext extends Observable {
 	}
 	
 	/**
-	 * Get the index of player to the left (forwards=false), or to the right (forwards=true).
+	 * Get the index of the next active player (not folded) to the left (forwards=false),
+	 * or to the right (forwards=true). 
 	 * @param startIndex
 	 * @param forwards
 	 * @return
@@ -129,7 +132,9 @@ public class PokerGameContext extends Observable {
 			} else {
 				startIndex = (startIndex - 1 + DEFAULT_GAME_SIZE) % DEFAULT_GAME_SIZE;
 			}
-		} while (this.playerMap.get(startIndex) == null);
+		} while (this.playerMap.get(startIndex) == null 
+				// ignore inactive players
+				&& !this.playerMap.get(startIndex).isActive());
 		return startIndex;
 	}
 
@@ -222,9 +227,8 @@ public class PokerGameContext extends Observable {
 		System.err.println("Unable to remove player (not found)" + name);
 	}
 	
-	public void betPreFlop(){
-		int startBetPosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);
-		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
+	public void betPreFlop(){		
+		this.currentActiveTablePosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);		
 	}
 	
 	public void betPostFlop(){

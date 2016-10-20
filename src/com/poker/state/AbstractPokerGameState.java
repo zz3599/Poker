@@ -49,6 +49,14 @@ public abstract class AbstractPokerGameState implements IState{
 		return this.state.name();
 	}
 	
+	public PokerGameContext getContext() {
+		return context;
+	}
+
+	public void setContext(PokerGameContext context) {
+		this.context = context;
+	}
+
 	@Override
 	public boolean equals(Object other){
 		if (!(other instanceof AbstractPokerGameState)) {
