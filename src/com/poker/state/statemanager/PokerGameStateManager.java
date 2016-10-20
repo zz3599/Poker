@@ -2,6 +2,7 @@ package com.poker.state.statemanager;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 	private Stack<GAMESTATE> stateStack = new Stack<GAMESTATE>();
 	
 	/** Not strictly necessary, as we can get this from the stack. This is to provide cleaner abstraction for current state */
-	private AbstractPokerGameState currentState;
+	private volatile AbstractPokerGameState currentState;
 	
 	/** Maps from game state into a set of transitionable game states */
 	private Map<GAMESTATE, Set<GAMESTATE>> stateTransitions = new HashMap<GAMESTATE, Set<GAMESTATE>>();
@@ -39,8 +40,7 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 	 * @param gameStates Collection of all possible game states.
 	 */
 	public PokerGameStateManager(AbstractPokerGameState initialState, Collection<AbstractPokerGameState> gameStates) {
-		this.currentState = initialState;
-		this.stateStack.push(initialState.getGameState());		
+		this.currentState = initialState;		
 		this.addGameStates(gameStates);
 	}
 	
@@ -92,16 +92,23 @@ public class PokerGameStateManager extends Observable implements IStateManager<A
 		if (this.stateTransitions.get(this.currentState.getGameState()).contains(nextState)){
 			// Update current state
 			this.currentState.obscuring();
+			// Push previous state to stack
+			this.stateStack.push(currentState.getGameState());
 			this.currentState = this.stateMap.get(nextState);
 			this.currentState.revealed();
 			System.out.println("Transitioning to " + currentState.getName());
-			// Push to stack
-			this.stateStack.push(nextState);
 			this.informListeners();
 		} else {
 			System.err.println("Invalid target state: " + nextState);
+		}		
+	}
+	
+	public synchronized GAMESTATE getPreviousState(){
+		try {
+			return stateStack.peek();
+		} catch (EmptyStackException e) {
+			return GAMESTATE.INVALID;
 		}
-		
 	}
 	
 	public synchronized AbstractPokerGameState popState(){

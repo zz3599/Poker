@@ -18,7 +18,11 @@ import javax.swing.JSlider;
 import com.poker.lib.GameEngine;
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
-import com.poker.ui.listener.ButtonMouseListener;
+import com.poker.ui.listener.button.BetButtonMouseListener;
+import com.poker.ui.listener.button.CheckOrCallButtonMouseListener;
+import com.poker.ui.listener.button.FoldButtonMouseListener;
+import com.poker.ui.listener.button.GameStateButtonMouseListener;
+import com.poker.ui.listener.slider.BettingSliderChangeListener;
 
 /**
  * Renders UI, contentpane for the actual game graphics, mouse listener.
@@ -40,6 +44,7 @@ public class PokerPanel extends JPanel implements Observer{
 	private JButton exitMenuButton = new JButton("Exit");
 	
 	private JButton betButton = new JButton("Bet");
+	// TODO: use BoundedRangeModel
 	private JSlider betSlider = new JSlider();
 	private JButton checkOrCallButton = new JButton("Check");
 	private JButton foldButton = new JButton("Fold");
@@ -64,13 +69,18 @@ public class PokerPanel extends JPanel implements Observer{
 		this.playMenuButton.setPreferredSize(new Dimension(this.gamePanel
 				.getPreferredSize().width, this.gamePanel
 				.getPreferredSize().height / 2));		
-		this.playMenuButton.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.STARTROUND));
+		this.playMenuButton.addMouseListener(new GameStateButtonMouseListener(engine, GAMESTATE.STARTROUND));
 		this.exitMenuButton.setPreferredSize(new Dimension(this.gamePanel
 				.getPreferredSize().width, this.gamePanel
 				.getPreferredSize().height / 2));		
-		this.exitMenuButton.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.EXIT));
+		this.exitMenuButton.addMouseListener(new GameStateButtonMouseListener(engine, GAMESTATE.EXIT));
 		
-		this.loadingLabel.addMouseListener(new ButtonMouseListener(engine, GAMESTATE.MENU));
+		this.loadingLabel.addMouseListener(new GameStateButtonMouseListener(engine, GAMESTATE.MENU));
+		
+		this.betSlider.addChangeListener(new BettingSliderChangeListener(engine));
+		this.betButton.addMouseListener(new BetButtonMouseListener(engine));
+		this.checkOrCallButton.addMouseListener(new CheckOrCallButtonMouseListener(engine));
+		this.foldButton.addMouseListener(new FoldButtonMouseListener(engine));
 		this.setUserButtonsEnabled(false);
 	}
 
@@ -83,9 +93,8 @@ public class PokerPanel extends JPanel implements Observer{
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         
-		AbstractPokerGameState state = engine.getStateManager().getCurrentState();
-		
-		switch (state.getGameState()) {
+        GAMESTATE currentState = engine.getStateManager().getCurrentState().getGameState();
+		switch (currentState) {
 		case STARTGAME:
 			// Very beginning of the game - render some generic title stuff
 			System.out.println("Loading...");

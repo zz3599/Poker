@@ -1,22 +1,25 @@
 package com.poker.command;
 
 import com.poker.lib.Player;
+import com.poker.lib.PokerGameContext;
 import com.poker.state.AbstractPokerGameState;
 
-public class BetCommand implements PokerCommand {
-	public Player player;
+public class BetCommand extends PokerCommand {
 
-	public BetCommand(Player player) {
-		this.player = player;
+	public BetCommand(Player player, PokerGameContext context) {
+		super(player, context);
 	}
 
 	@Override
 	public boolean isLegal(AbstractPokerGameState gameState) {
-		return gameState.getName().contains("BET");
+		boolean correctState = gameState.getName().toLowerCase().contains("bet");
+		return correctState && 
+				gameState.getContext().currentActiveTablePosition == player.getTablePosition();
 	}
 
 	@Override
 	public void apply(AbstractPokerGameState gameState) {
+		
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import com.poker.lib.message.AsyncDispatcher;
+import com.poker.lib.message.EventQueue;
 import com.poker.state.AbstractPokerGameState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 import com.poker.state.EndRoundState;
@@ -28,7 +28,7 @@ public class GameEngine implements Runnable {
 	private PokerGameStateManager stateManager;
 	private PokerGameContext context;
 	private PokerFrame frame;
-	private AsyncDispatcher asyncDispatcher;
+	private EventQueue eventQueue;
 	
 	public GameEngine() {		
 		/**
@@ -38,7 +38,7 @@ public class GameEngine implements Runnable {
 		 */
 		
 		this.context = new PokerGameContext();
-
+		this.eventQueue = new EventQueue(this);
 		AbstractPokerGameState startState = new StartGameState(context);
 		List<AbstractPokerGameState> gameStates = Arrays
 				.asList(startState,
@@ -81,16 +81,17 @@ public class GameEngine implements Runnable {
 	public void run() {
 		// 1. Process events from the UI -> change state, context, etc.
 		// 2. Render the current state.
-//		while(true){			
-//			try {
-//				// Repaint the UI when there are changes needed							
-//				// Render game contents
-//				frame.getPokerPanel().repaint();				
-//				Thread.sleep(SLEEP_INTERVAL_MS);				
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
+		while(true){			
+			try {
+				// Repaint the UI when there are changes needed							
+				// Render game contents
+				this.eventQueue.handleEvents();
+				frame.getPokerPanel().repaint();				
+				Thread.currentThread().sleep(SLEEP_INTERVAL_MS);			
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 	}
 
@@ -105,4 +106,8 @@ public class GameEngine implements Runnable {
 	public JFrame getFrame(){
 		return frame;
 	}
+
+	public EventQueue getEventQueue() {
+		return eventQueue;
+	}	
 }

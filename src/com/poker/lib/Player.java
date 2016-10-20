@@ -3,6 +3,8 @@ package com.poker.lib;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.poker.command.BetCommand;
+import com.poker.command.PokerCommand;
 import com.poker.hand.Hand;
 import com.poker.sprite.TablePositionSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
@@ -24,11 +26,15 @@ public class Player extends TablePositionSprite implements Observer {
 	public boolean isBB;
 	public boolean isSB;
 	
-	public Player(String name, int id, int tablePosition) {
-		this(name, id, tablePosition, DEFAULT_MONEY);
+	public PokerGameContext context;
+	
+	public PokerCommand[] pokerCommands;
+	
+	public Player(PokerGameContext context, String name, int id, int tablePosition) {
+		this(context, name, id, tablePosition, DEFAULT_MONEY);
 	}
 
-	private Player(String name, int id, int tablePosition, int money) {
+	private Player(PokerGameContext context, String name, int id, int tablePosition, int money) {
 		super(tablePosition);
 		this.name = name;
 		this.id = id;
@@ -37,6 +43,8 @@ public class Player extends TablePositionSprite implements Observer {
 		this.betAmount = 0;
 		// Will be reset to false when the round is complete.
 		this.folded = false;
+		this.context = context;
+		this.pokerCommands = new PokerCommand[]{new BetCommand(this, context)};
 	}
 
 	public void setHand(Hand hand) {
