@@ -42,5 +42,16 @@ public class RenderList {
 		return sprites;
 	}
 	
+	public int getSize(){
+		int count = 0;
+		for(List<? extends IRenderable> objects : renderMap.values()){
+			count += objects.size();
+		}
+		if (sprites != null){
+			count += sprites.size();
+		}
+		return count;
+	}
+	
 	
 }

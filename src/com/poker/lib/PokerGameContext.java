@@ -142,32 +142,17 @@ public class PokerGameContext extends Observable {
 	
 	private void deal() {
 		deck.shuffle();
-		int startDealingIndex = getNextPlayerIndex(dealerSprite.getTablePosition(), false);
-		for (int idx = startDealingIndex; ; idx = getNextPlayerIndex(idx, false)) {
-			Player player = playerMap.get(idx);
-			AsyncDispatcher.getInstance().schedule(this.getClass(), new Runnable() {
-				@Override
-				public void run() {
-					try {
-						deck.deal(player, playerMap.size());
-						// Trigger a render
-						informObservers(new GameStateObservableMessage(
-								GAMESTATE.STARTROUND, GAMESTATE.STARTROUND
-										.name()));
-						// If the last player, trigger state transition
-						if (doneDealing()){
-							informObservers(new GameStateObservableMessage(GAMESTATE.PREFLOP_BET,
-									GAMESTATE.PREFLOP_BET.name()));
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-			if (idx == dealerSprite.getTablePosition()){
-				break;
+		try {
+			deck.deal(playerMap.values());
+		} catch (PokerException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} finally {
+			if(doneDealing()){
+				informObservers(new GameStateObservableMessage(GAMESTATE.PREFLOP_BET,
+						GAMESTATE.PREFLOP_BET.name()));
 			}
-		}		
+		}	
 	}
 	
 	private boolean doneDealing(){

@@ -9,6 +9,7 @@ public abstract class AbstractPokerGameState implements IState{
 	protected GAMESTATE state;
 	
 	public enum GAMESTATE {
+		INVALID,
 		STARTGAME, //animation
 		MENU, //choose a table
 		STARTROUND, //new round of poker
