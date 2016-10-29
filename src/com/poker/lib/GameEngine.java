@@ -29,6 +29,7 @@ public class GameEngine implements Runnable {
 	private PokerGameContext context;
 	private PokerFrame frame;
 	private EventQueue eventQueue;
+	private volatile boolean isRenderEnabled = false;
 	
 	public GameEngine() {		
 		/**
@@ -37,13 +38,14 @@ public class GameEngine implements Runnable {
 		 * http://blog.nuclex-games.com/tutorials/cxx/game-state-management/
 		 */
 		
-		this.context = new PokerGameContext();
+		this.context = new PokerGameContext(this);
 		this.eventQueue = new EventQueue(this);
-		AbstractPokerGameState startState = new StartGameState(context);
+		AbstractPokerGameState startState = new MenuState(context);
 		List<AbstractPokerGameState> gameStates = Arrays
 				.asList(startState,
+						new StartGameState(context),
 						new EndRoundState(context), new FlopState(context),
-						new MenuState(context), new PostflopBetState(context),
+						new PostflopBetState(context),
 						new PostriverBetState(context),
 						new PostturnBetState(context),
 						new PreflopBetState(context), 
@@ -73,10 +75,6 @@ public class GameEngine implements Runnable {
 		this.stateManager.addObserver(this.frame.getPokerPanel());		
 	}
 
-	public void start() {
-		// Initialize the state
-	}
-
 	@Override
 	public void run() {
 		// 1. Process events from the UI -> change state, context, etc.
@@ -86,13 +84,20 @@ public class GameEngine implements Runnable {
 				// Repaint the UI when there are changes needed							
 				// Render game contents
 				this.eventQueue.handleEvents();
-				frame.getPokerPanel().repaint();				
+				this.context.update();
+				if (isRenderEnabled){
+					frame.getPokerPanel().repaint();
+				}
 				Thread.currentThread().sleep(SLEEP_INTERVAL_MS);			
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
+	}
+	
+	public void setIsRenderEnabled(boolean flag){
+		this.isRenderEnabled = flag;
 	}
 
 	public PokerGameStateManager getStateManager() {

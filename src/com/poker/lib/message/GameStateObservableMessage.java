@@ -25,8 +25,12 @@ public class GameStateObservableMessage extends ObservableMessage {
 					new WindowEvent(engine.getFrame(),
 							WindowEvent.WINDOW_CLOSING));
 			return;
+		} else if (targetState == GAMESTATE.STARTROUND){
+			System.out.println("Starting game loop");
+			engine.setIsRenderEnabled(true);
 		}
 		engine.getStateManager().advanceState(targetState);
+		
 		
 	}	
 }

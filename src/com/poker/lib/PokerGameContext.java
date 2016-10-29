@@ -27,6 +27,7 @@ public class PokerGameContext extends Observable {
 	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
 			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris",
 			"Ivana", "Joey" };
+	private GameEngine engine;
 	/** The user's player id */
 	public final int playerId = 0;
 	
@@ -55,6 +56,11 @@ public class PokerGameContext extends Observable {
 	
 	private BlindsPolicy blindsPolicy;
 
+	public PokerGameContext(GameEngine engine){
+		this();
+		this.engine = engine;
+	}
+	
 	public PokerGameContext() {
 		this.deck = new Deck();
 		this.communityCards = new ArrayList<Card>();
@@ -149,8 +155,7 @@ public class PokerGameContext extends Observable {
 			e1.printStackTrace();
 		} finally {
 			if(doneDealing()){
-				informObservers(new GameStateObservableMessage(GAMESTATE.PREFLOP_BET,
-						GAMESTATE.PREFLOP_BET.name()));
+				engine.getStateManager().advanceState(GAMESTATE.PREFLOP_BET);				
 			}
 		}	
 	}
@@ -215,7 +220,7 @@ public class PokerGameContext extends Observable {
 	public void betPreFlop(){		
 		this.currentActiveTablePosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);		
 	}
-	
+		
 	public void betPostFlop(){
 		int startBetPosition = this.getNextPlayerIndex(dealerSprite.getTablePosition(), false);
 		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
@@ -307,5 +312,17 @@ public class PokerGameContext extends Observable {
 				dealerSprite, 
 				bigBlindsSprite, 
 				smallBlindsSprite);	
+	}
+	
+	/**
+	 * This will update this object based on the current state in the state manager.
+	 */
+	public void update(){
+		GAMESTATE gameState = engine.getStateManager().getCurrentState().getGameState();
+		switch(gameState){
+		case PREFLOP_BET:
+			
+			break;
+		}
 	}
 }
