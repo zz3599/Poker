@@ -88,8 +88,7 @@ public class RenderManager {
 		}
 		//Render the pot size		
 		String potSize = renderList.getDrawString(RenderList.POT_SIZE);
-		if (potSize != null){
-			System.out.println("Potsize: " + potSize);
+		if (potSize != null){			
 			g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
 		}
 		System.out.println("Rendered " + renderList.getSize() + " objects");
