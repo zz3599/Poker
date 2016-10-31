@@ -16,6 +16,7 @@ import com.poker.lib.message.GameStateObservableMessage;
 import com.poker.sprite.BlindsSprite;
 import com.poker.sprite.DealerSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
+import com.poker.ui.listener.slider.BettingSliderChangeListener;
 
 /**
  * Blindspolicy and gamestatemanager observes this.
@@ -34,6 +35,7 @@ public class PokerGameContext extends Observable {
 	public final List<Card> communityCards;
 	
 	public int potSize;
+	/** current max bet is the amount other players have to minimally call in order to continue playing */
 	public int maxBet;
 	public final Deck deck;
 	/** Seat index -> player */
@@ -114,13 +116,13 @@ public class PokerGameContext extends Observable {
 	}
 	
 	private void updateDealerAndBlinds(){
-		int dealerIndex = this.getNextPlayerIndex(dealerSprite.getTablePosition(), true);
+		int dealerIndex = this.getNextActivePlayerIndex(dealerSprite.getTablePosition(), true);
 		this.playerMap.get(dealerIndex).isDealer = true;
 		this.dealerSprite.setTablePosition(dealerIndex);
 		// Update the blinds sprites. Small blinds to the left, big blinds to the left of SB.
-		this.smallBlindsSprite.setTablePosition(this.getNextPlayerIndex(
+		this.smallBlindsSprite.setTablePosition(this.getNextActivePlayerIndex(
 				dealerSprite.getTablePosition(), false));
-		this.bigBlindsSprite.setTablePosition(this.getNextPlayerIndex(
+		this.bigBlindsSprite.setTablePosition(this.getNextActivePlayerIndex(
 				smallBlindsSprite.getTablePosition(), false));		
 	}
 	
@@ -131,7 +133,7 @@ public class PokerGameContext extends Observable {
 	 * @param forwards
 	 * @return
 	 */
-	private int getNextPlayerIndex(int startIndex, boolean forwards){
+	private int getNextActivePlayerIndex(int startIndex, boolean forwards){
 		do {
 			if (forwards){
 				startIndex = (startIndex + 1) % DEFAULT_GAME_SIZE;
@@ -218,11 +220,11 @@ public class PokerGameContext extends Observable {
 	}
 	
 	public void betPreFlop(){		
-		this.currentActiveTablePosition = this.getNextPlayerIndex(bigBlindsSprite.getTablePosition(), false);		
+		this.currentActiveTablePosition = this.getNextActivePlayerIndex(bigBlindsSprite.getTablePosition(), false);		
 	}
 		
 	public void betPostFlop(){
-		int startBetPosition = this.getNextPlayerIndex(dealerSprite.getTablePosition(), false);
+		int startBetPosition = this.getNextActivePlayerIndex(dealerSprite.getTablePosition(), false);
 		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
 	}
 	
@@ -261,7 +263,7 @@ public class PokerGameContext extends Observable {
 						e.printStackTrace();
 					}
 					activeTablePosition = tablePosition;
-					tablePosition = getNextPlayerIndex(tablePosition, false);			
+					tablePosition = getNextActivePlayerIndex(tablePosition, false);			
 				} while(!isBettingDone());
 				System.out.println("Done betting from " + initialState + " to " + finalState);
 				informObservers(new GameStateObservableMessage(finalState, finalState.name()));				
@@ -321,7 +323,33 @@ public class PokerGameContext extends Observable {
 		GAMESTATE gameState = engine.getStateManager().getCurrentState().getGameState();
 		switch(gameState){
 		case PREFLOP_BET:
-			
+			if (isBettingDone()){
+				engine.getStateManager().advanceState(GAMESTATE.FLOP);
+			} else {
+				Player currentActivePlayer = playerMap
+						.get(currentActiveTablePosition);
+				if (this.isBettingDone()) {
+					this.engine.getStateManager().advanceState(GAMESTATE.FLOP);
+				} else {
+					this.currentActiveTablePosition = this
+							.getNextActivePlayerIndex(
+									currentActiveTablePosition, false);
+				}
+				int decision = RANDOM.nextInt(2);
+				if (decision == 0) {
+					// Target amount is maxBet. We need to bet maxBet-currentBet
+					// to get there.
+					int betAmount = maxBet - currentActivePlayer.betAmount;
+					currentActivePlayer.bet(betAmount);
+					potSize += betAmount;
+				} else {
+					currentActivePlayer.setFolded(true);
+				}
+				currentActiveTablePosition = getNextActivePlayerIndex(
+						currentActiveTablePosition, false);
+			}
+			break;
+		default:
 			break;
 		}
 	}
