@@ -54,7 +54,7 @@ public class Player extends TablePositionSprite implements Observer {
 	public void removeHand() {
 		this.hand = null;
 	}
-
+	
 	/**
 	 * Returns the total money actually bet.
 	 * @param amt The amount we want to bet.

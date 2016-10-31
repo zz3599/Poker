@@ -6,6 +6,7 @@ import com.poker.state.AbstractPokerGameState;
 
 public class BetCommand extends PokerCommand {
 
+	public int betAmount;
 	public BetCommand(Player player, PokerGameContext context) {
 		super(player, context);
 	}
@@ -19,7 +20,8 @@ public class BetCommand extends PokerCommand {
 
 	@Override
 	public void apply(AbstractPokerGameState gameState) {
-		
+		gameState.getContext().potSize += betAmount;
+		betAmount = 0;
 	}
 
 }
