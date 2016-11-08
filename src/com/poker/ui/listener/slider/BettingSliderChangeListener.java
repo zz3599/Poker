@@ -18,9 +18,7 @@ public class BettingSliderChangeListener implements ChangeListener {
 		Object source = arg0.getSource();
 		if(source instanceof JSlider){
 			int betValue = ((JSlider) source).getValue();
-			// TODO: use BoundedRangeModel
-			System.out.println("Betting value set to " + betValue);
-			engine.getContext().getUserPlayer().betAmount = betValue;
+			System.out.println("Betting value set to " + betValue);			
 		}
 	}
 

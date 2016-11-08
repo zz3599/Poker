@@ -20,8 +20,9 @@ public class CheckOrCallButtonMouseListener extends ButtonMouseListener{
 				userPlayer.setFolded(false);
 				if (userPlayer.betAmount < engine.getContext().maxBet){
 					// this is a call
+					engine.getContext().potSize += engine.getContext().maxBet - userPlayer.betAmount;
 					userPlayer.betAmount = engine.getContext().maxBet;			
-					System.out.println(userPlayer + " called...setting to " + userPlayer.betAmount);
+					System.out.println(userPlayer + " called...setting to " + userPlayer.betAmount);					
 					return;
 				}
 				// if checking, nothing should happen

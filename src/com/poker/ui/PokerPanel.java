@@ -44,7 +44,6 @@ public class PokerPanel extends JPanel implements Observer{
 	private JButton exitMenuButton = new JButton("Exit");
 	
 	private JButton betButton = new JButton("Bet");
-	// TODO: use BoundedRangeModel
 	private JSlider betSlider = new JSlider();
 	private JButton checkOrCallButton = new JButton("Check");
 	private JButton foldButton = new JButton("Fold");
@@ -127,8 +126,20 @@ public class PokerPanel extends JPanel implements Observer{
 		betSlider.setEnabled(enabled);
 	}
 	
+	public void updateSliderModel(int playerMoney){
+		betSlider.setMajorTickSpacing(playerMoney/4);
+		betSlider.setPaintLabels(true);
+		betSlider.setPaintTicks(true);
+		betSlider.getModel().setMaximum(playerMoney);
+		betSlider.getModel().setMinimum(0);
+	}
+	
 	public JPanel getGamePanel(){
 		return this.gamePanel;
+	}
+	
+	public int getPlayerBetAmount(){
+		return betSlider.getValue();
 	}
 
 	@Override

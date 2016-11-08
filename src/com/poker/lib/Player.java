@@ -72,6 +72,7 @@ public class Player extends TablePositionSprite implements Observer {
 	
 	public void bet(int amt){		
 		this.betAmount += this.addMoney(-amt);
+		System.out.println(this.name + ": player::bet=" + amt + ", player.betAmount=" + this.betAmount);
 	}	
 
 	public boolean isFolded() {
@@ -142,6 +143,7 @@ public class Player extends TablePositionSprite implements Observer {
 			String event = (String) e;
 			if(event.equalsIgnoreCase(GAMESTATE.ENDROUND.name())){
 				// At the end of the round, we reset our state and bet amounts.
+				System.out.println("Resetting player: " + this.name);
 				this.folded = false;
 				this.betAmount = 0;				
 			}

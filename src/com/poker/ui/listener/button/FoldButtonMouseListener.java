@@ -14,7 +14,8 @@ public class FoldButtonMouseListener extends ButtonMouseListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		engine.getEventQueue().queue(new ObservableMessage(getClass().getName()){
-			public void update(GameEngine engine){				
+			public void update(GameEngine engine){
+				engine.getContext().potSize += engine.getContext().getUserPlayer().betAmount;
 				engine.getContext().getUserPlayer().setFolded(true);
 			}
 		});		

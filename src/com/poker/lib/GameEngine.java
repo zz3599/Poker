@@ -23,7 +23,7 @@ import com.poker.state.statemanager.PokerGameStateManager;
 import com.poker.ui.PokerFrame;
 
 public class GameEngine implements Runnable {
-	private static final int SLEEP_INTERVAL_MS = 400;
+	private static final int SLEEP_INTERVAL_MS = 500;
 	
 	private PokerGameStateManager stateManager;
 	private PokerGameContext context;
@@ -108,7 +108,7 @@ public class GameEngine implements Runnable {
 		return context;
 	}	
 	
-	public JFrame getFrame(){
+	public PokerFrame getFrame(){
 		return frame;
 	}
 

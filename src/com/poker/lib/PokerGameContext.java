@@ -16,7 +16,6 @@ import com.poker.lib.message.GameStateObservableMessage;
 import com.poker.sprite.BlindsSprite;
 import com.poker.sprite.DealerSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
-import com.poker.ui.listener.slider.BettingSliderChangeListener;
 
 /**
  * Blindspolicy and gamestatemanager observes this.
@@ -224,50 +223,7 @@ public class PokerGameContext extends Observable {
 	}
 		
 	public void betPostFlop(){
-		int startBetPosition = this.getNextActivePlayerIndex(dealerSprite.getTablePosition(), false);
-		this.betRound(startBetPosition, GAMESTATE.PREFLOP_BET, GAMESTATE.FLOP);
-	}
-	
-	private void betRound(int startTablePosition, GAMESTATE initialState, GAMESTATE finalState){
-		// This has to go in a separate thread - these updates cannot happen synchronously;
-		new Thread(new Runnable(){
-			@Override
-			public void run() {
-				int tablePosition = startTablePosition;
-				do {
-					Player player = playerMap.get(tablePosition);
-//					if (player.id == playerId){
-//						//wait for the user input
-//						try {
-//							Thread.sleep(100);
-//						} catch (InterruptedException e) {
-//							e.printStackTrace();
-//						}
-//					} else {
-						// Randomize AI for now. TODO: add decision making to the AI.
-						int decision = RANDOM.nextInt(2);
-						if (decision == 0){
-							// Target amount is maxBet. We need to bet maxBet-currentBet to get there.
-							int betAmount = maxBet - player.betAmount;
-							player.bet(betAmount);
-							potSize += betAmount;
-						} else {
-							player.setFolded(true);
-						}
-					//}
-					// This will trigger a repaint
-					informObservers(new GameStateObservableMessage(initialState, initialState.name()));
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					activeTablePosition = tablePosition;
-					tablePosition = getNextActivePlayerIndex(tablePosition, false);			
-				} while(!isBettingDone());
-				System.out.println("Done betting from " + initialState + " to " + finalState);
-				informObservers(new GameStateObservableMessage(finalState, finalState.name()));				
-			}}).start();
+		this.currentActiveTablePosition = this.getNextActivePlayerIndex(dealerSprite.getTablePosition(), false);		
 	}
 	
 	private boolean isBettingDone(){
@@ -316,6 +272,35 @@ public class PokerGameContext extends Observable {
 				smallBlindsSprite);	
 	}
 	
+	private void betRound(GAMESTATE targetStateWhenCompleted){
+		if (isBettingDone()){
+			engine.getStateManager().advanceState(targetStateWhenCompleted);
+		} else {			
+			Player currentActivePlayer = playerMap
+					.get(currentActiveTablePosition);
+			if (currentActivePlayer.id == this.playerId && currentActivePlayer.betAmount < maxBet){
+				// Wait on user input in this case.
+				engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money);
+				engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);				
+				System.out.println("Waiting on user bet... current bet=" + currentActivePlayer.betAmount);
+				return;
+			}
+			int decision = RANDOM.nextInt(2);
+			System.out.println(currentActivePlayer.name + " deciding...");
+			if (decision == 0) {
+				// Target amount is maxBet. We need to bet maxBet-currentBet
+				// to get there.					
+				int betAmount = maxBet - currentActivePlayer.betAmount;
+				currentActivePlayer.bet(betAmount);
+				potSize += betAmount;
+			} else {
+				currentActivePlayer.setFolded(true);
+			}
+			currentActiveTablePosition = getNextActivePlayerIndex(
+					currentActiveTablePosition, false);
+		}
+	}
+	
 	/**
 	 * This will update this object based on the current state in the state manager.
 	 */
@@ -323,31 +308,7 @@ public class PokerGameContext extends Observable {
 		GAMESTATE gameState = engine.getStateManager().getCurrentState().getGameState();
 		switch(gameState){
 		case PREFLOP_BET:
-			if (isBettingDone()){
-				engine.getStateManager().advanceState(GAMESTATE.FLOP);
-			} else {
-				Player currentActivePlayer = playerMap
-						.get(currentActiveTablePosition);
-				if (this.isBettingDone()) {
-					this.engine.getStateManager().advanceState(GAMESTATE.FLOP);
-				} else {
-					this.currentActiveTablePosition = this
-							.getNextActivePlayerIndex(
-									currentActiveTablePosition, false);
-				}
-				int decision = RANDOM.nextInt(2);
-				if (decision == 0) {
-					// Target amount is maxBet. We need to bet maxBet-currentBet
-					// to get there.
-					int betAmount = maxBet - currentActivePlayer.betAmount;
-					currentActivePlayer.bet(betAmount);
-					potSize += betAmount;
-				} else {
-					currentActivePlayer.setFolded(true);
-				}
-				currentActiveTablePosition = getNextActivePlayerIndex(
-						currentActiveTablePosition, false);
-			}
+			this.betRound(GAMESTATE.FLOP);
 			break;
 		default:
 			break;
