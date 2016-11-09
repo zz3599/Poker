@@ -1,6 +1,7 @@
 package com.poker.state;
 
 import com.poker.lib.PokerGameContext;
+import com.poker.lib.RenderList;
 
 public class PostriverBetState extends AbstractPokerGameState{
 	public PostriverBetState(PokerGameContext context) {
@@ -27,8 +28,13 @@ public class PostriverBetState extends AbstractPokerGameState{
 
 	@Override
 	public void revealed() {
-		// TODO Auto-generated method stub
+		this.context.betPreFlop();
 		
+	}
+	
+	@Override
+	public RenderList getRenderList(){
+		return context.getRenderList();
 	}
 }
 

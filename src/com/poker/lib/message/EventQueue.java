@@ -71,6 +71,8 @@ public class EventQueue {
 				message.isConsumed = true;
 			}
 		}
-		System.out.println("EventQueue handling events: " + usedEvents + ", total size: " + events2.size());
+		if (usedEvents > 0){
+			System.out.println("EventQueue handling events: " + usedEvents + ", total size: " + events2.size());
+		}
 	}
 }

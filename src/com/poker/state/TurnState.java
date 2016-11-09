@@ -1,6 +1,8 @@
 package com.poker.state;
 
+import com.poker.exception.PokerException;
 import com.poker.lib.PokerGameContext;
+import com.poker.lib.RenderList;
 
 public class TurnState extends AbstractPokerGameState{
 	public TurnState(PokerGameContext context) {
@@ -27,8 +29,18 @@ public class TurnState extends AbstractPokerGameState{
 
 	@Override
 	public void revealed() {
-		// TODO Auto-generated method stub
+		try {
+			this.context.turnOrRiver();
+		} catch (PokerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+	}
+	
+	@Override
+	public RenderList getRenderList(){
+		return context.getRenderList();
 	}
 }
 

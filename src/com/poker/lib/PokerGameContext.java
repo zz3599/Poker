@@ -254,6 +254,17 @@ public class PokerGameContext extends Observable {
 		return true;
 	}	
 	
+	private void resetBets(){
+		for(int i = 0; i < DEFAULT_GAME_SIZE; i++){
+			if(this.playerMap.get(i) == null){
+				// Skip if there is no player at the seat.
+				continue;
+			}
+			Player player = this.playerMap.get(i);
+			player.betAmount = 0;
+		}
+	}
+	
 	public Player getUserPlayer(){
 		return this.playerMap.get(0);
 	}
@@ -273,16 +284,25 @@ public class PokerGameContext extends Observable {
 	}
 	
 	private void betRound(GAMESTATE targetStateWhenCompleted){
-		if (isBettingDone()){
+		if (isBettingDone()) {
+			this.resetBets();
+			engine.getFrame().getPokerPanel().setUserButtonsEnabled(false);
 			engine.getStateManager().advanceState(targetStateWhenCompleted);
-		} else {			
+		} else {
 			Player currentActivePlayer = playerMap
 					.get(currentActiveTablePosition);
-			if (currentActivePlayer.id == this.playerId && currentActivePlayer.betAmount < maxBet){
-				// Wait on user input in this case.
-				engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money);
-				engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);				
-				System.out.println("Waiting on user bet... current bet=" + currentActivePlayer.betAmount);
+			if (currentActivePlayer.id == this.playerId){
+				if (currentActivePlayer.betAmount < maxBet){
+					// Wait on user input in this case.
+					engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money);
+					engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);				
+					System.out.println("Waiting on user bet... current bet=" + currentActivePlayer.betAmount);
+					return;
+				} else {
+					//Advance to the next player
+					currentActiveTablePosition = getNextActivePlayerIndex(
+							currentActiveTablePosition, false);
+				}
 				return;
 			}
 			int decision = RANDOM.nextInt(2);
@@ -309,6 +329,24 @@ public class PokerGameContext extends Observable {
 		switch(gameState){
 		case PREFLOP_BET:
 			this.betRound(GAMESTATE.FLOP);
+			break;
+		case FLOP:
+			engine.getStateManager().advanceState(GAMESTATE.POSTFLOP_BET);
+			break;
+		case POSTFLOP_BET:
+			this.betRound(GAMESTATE.TURN);
+			break;
+		case TURN:
+			engine.getStateManager().advanceState(GAMESTATE.POSTTURN_BET);
+			break;
+		case POSTTURN_BET:
+			this.betRound(GAMESTATE.RIVER);
+			break;
+		case RIVER:
+			engine.getStateManager().advanceState(GAMESTATE.POSTRIVER_BET);
+			break;
+		case POSTRIVER_BET:
+			this.betRound(GAMESTATE.ENDROUND);
 			break;
 		default:
 			break;

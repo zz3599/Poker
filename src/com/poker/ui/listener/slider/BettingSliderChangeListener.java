@@ -18,7 +18,7 @@ public class BettingSliderChangeListener implements ChangeListener {
 		Object source = arg0.getSource();
 		if(source instanceof JSlider){
 			int betValue = ((JSlider) source).getValue();
-			System.out.println("Betting value set to " + betValue);			
+			//System.out.println("Betting value set to " + betValue);			
 		}
 	}
 

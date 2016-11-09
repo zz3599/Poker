@@ -107,6 +107,7 @@ public class PokerPanel extends JPanel implements Observer{
 			this.gamePanel.add(exitMenuButton, BorderLayout.SOUTH);
 			break;
 		case STARTROUND:
+	
 		case PREFLOP_BET:
 		case FLOP:
 			this.gamePanel.removeAll();
@@ -114,7 +115,7 @@ public class PokerPanel extends JPanel implements Observer{
 			this.actionPanel.add(betSlider);
 			this.actionPanel.add(checkOrCallButton);
 			this.actionPanel.add(foldButton);
-			break;			
+			break;
 		}
 		this.revalidate();
 	}
