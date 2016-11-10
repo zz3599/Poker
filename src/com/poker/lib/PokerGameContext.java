@@ -80,6 +80,7 @@ public class PokerGameContext extends Observable {
 			// The players will reset when the round is ended.
 			this.addObserver(newPlayer);
 		}
+		this.addObserver(this.blindsPolicy);
 		
 		// Create the async queue
 		AsyncDispatcher.getInstance().createContextQueue(this.getClass(), 250);
