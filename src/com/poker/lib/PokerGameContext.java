@@ -141,7 +141,7 @@ public class PokerGameContext extends Observable {
 			}
 		} while (this.playerMap.get(startIndex) == null 
 				// ignore inactive players
-				&& !this.playerMap.get(startIndex).isActive());
+				|| !this.playerMap.get(startIndex).isActive());
 		return startIndex;
 	}
 
@@ -228,7 +228,9 @@ public class PokerGameContext extends Observable {
 	
 	private boolean isBettingDone(){
 		// All players must have the same amount betted in order for betting to be done.
-		int tableBetAmount = -1;
+		if (this.maxBet <= 0){
+			return false;
+		}
 		for(int i = 0; i < DEFAULT_GAME_SIZE; i++){
 			if(this.playerMap.get(i) == null){
 				// Skip if there is no player at the seat.
@@ -243,13 +245,10 @@ public class PokerGameContext extends Observable {
 				return false;
 			}
 			int playerBet = player.betAmount;
-			if (tableBetAmount == -1){
-				tableBetAmount = playerBet;
-			} else {
-				if (playerBet != tableBetAmount){
-					return false;
-				}
-			}			
+			if (playerBet < this.maxBet){
+				System.out.println("Player " + player.name + " bet amount: " + playerBet + ", maxBet: " + maxBet);
+				return false;
+			}					
 		}
 		return true;
 	}	
@@ -263,6 +262,7 @@ public class PokerGameContext extends Observable {
 			Player player = this.playerMap.get(i);
 			player.betAmount = 0;
 		}
+		this.maxBet = this.blindsPolicy.getBigBlind();
 	}
 	
 	public Player getUserPlayer(){

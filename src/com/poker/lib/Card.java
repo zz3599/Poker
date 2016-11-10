@@ -11,8 +11,8 @@ public class Card implements Comparable<Card>, IRenderable {
 	public static Integer MIN_VALUE = 2;
 	public static Integer MAX_VALUE = 14;
 
-	public Suite suite;
-	public int value;
+	public final Suite suite;
+	public final int value;
 	public Player owner;
 	/** TODO: Change this to false eventually */
 	public boolean revealed = true;

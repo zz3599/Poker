@@ -25,7 +25,7 @@ public class LRUCache <CACHEKEY, CACHEVALUE>{
 	 * @param key
 	 * @param value
 	 */
-	public void put(CACHEKEY key, CACHEVALUE value){
+	public synchronized void put(CACHEKEY key, CACHEVALUE value){
 		if(value == null){
 			return;
 		}
@@ -48,7 +48,7 @@ public class LRUCache <CACHEKEY, CACHEVALUE>{
 	 * @param key
 	 * @return
 	 */
-	public CACHEVALUE get(CACHEKEY key){
+	public synchronized CACHEVALUE get(CACHEKEY key){
 		if (leastRecentlyUsedMap.keySet().contains(key)){
 			this.usedKey(key, leastRecentlyUsedMap.get(key));
 		}

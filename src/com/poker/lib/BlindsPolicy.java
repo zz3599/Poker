@@ -3,7 +3,8 @@ package com.poker.lib;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.poker.constants.Constants;
+import com.poker.lib.message.GameStateObservableMessage;
+import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
 /**
  * Manages how much blinds should increase by and when to increase. It must be
@@ -27,8 +28,8 @@ public class BlindsPolicy implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 		// Only increment the rounds count if the event is actually a round ended event.
-		if (arg instanceof String
-				&& ((String) arg).equalsIgnoreCase(Constants.ROUND_ENDED_EVENT)) {
+		if (arg instanceof GameStateObservableMessage
+				&& ((GameStateObservableMessage) arg).getTargetState() == GAMESTATE.ENDROUND) {
 			rounds++;
 			if (rounds % roundsBeforeIncrement == 0) {
 				smallBlind += increment;

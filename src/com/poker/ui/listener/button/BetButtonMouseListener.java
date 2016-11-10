@@ -20,7 +20,7 @@ public class BetButtonMouseListener extends ButtonMouseListener {
 				if (userPlayer.getTablePosition() == engine.getContext().getActiveTablePosition()){
 					// bet the amount
 					int playerBetAmount = engine.getFrame().getPokerPanel().getPlayerBetAmount();
-					System.out.println("Invoking bet button event=" + playerBetAmount);
+					System.out.println("Invoking bet button amount=" + playerBetAmount);
 					userPlayer.betAmount = playerBetAmount;
 					engine.getContext().potSize += userPlayer.betAmount;
 					if (playerBetAmount > engine.getContext().maxBet){

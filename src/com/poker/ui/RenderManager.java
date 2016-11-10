@@ -91,7 +91,7 @@ public class RenderManager {
 		if (potSize != null){			
 			g.drawString("Potsize: " + potSize, c.getWidth()/2, 10);
 		}
-		System.out.println("Rendered " + renderList.getSize() + " objects");
+		//System.out.println("Rendered " + renderList.getSize() + " objects");
 	}
 	
 	private List<IRenderable> getSpritesAtTablePosition(int position, List<? extends IRenderable> spriteList){

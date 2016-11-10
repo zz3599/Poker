@@ -44,7 +44,7 @@ public class PokerPanel extends JPanel implements Observer{
 	private JButton exitMenuButton = new JButton("Exit");
 	
 	private JButton betButton = new JButton("Bet");
-	private JSlider betSlider = new JSlider();
+	private JSlider betSlider = new JSlider(JSlider.HORIZONTAL);
 	private JButton checkOrCallButton = new JButton("Check");
 	private JButton foldButton = new JButton("Fold");
 	
@@ -131,11 +131,11 @@ public class PokerPanel extends JPanel implements Observer{
 	}
 	
 	public void updateSliderModel(int playerMoney){
-		betSlider.setMajorTickSpacing(playerMoney/4);
-		betSlider.setPaintLabels(true);
-		betSlider.setPaintTicks(true);
 		betSlider.getModel().setMaximum(playerMoney);
 		betSlider.getModel().setMinimum(0);
+		betSlider.setMajorTickSpacing(playerMoney/4);
+		betSlider.setPaintLabels(true);
+		betSlider.setPaintTicks(true);		
 	}
 	
 	public JPanel getGamePanel(){

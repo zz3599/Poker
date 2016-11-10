@@ -72,14 +72,14 @@ public class Player extends TablePositionSprite implements Observer {
 	
 	public void bet(int amt){		
 		this.betAmount += this.addMoney(-amt);
-		System.out.println(this.name + ": player::bet=" + amt + ", player.betAmount=" + this.betAmount);
+		System.out.println(this.name + ": player::bet=" + amt + ", betAmount=" + this.betAmount + ", moneyLeft=" + this.money);
 	}	
 
-	public boolean isFolded() {
+	public synchronized boolean isFolded() {
 		return folded;
 	}
 
-	public void setFolded(boolean folded) {
+	public synchronized void setFolded(boolean folded) {
 		this.folded = folded;
 		// Don't reveal folded cards.
 		if (folded){
@@ -144,7 +144,7 @@ public class Player extends TablePositionSprite implements Observer {
 			if(event.equalsIgnoreCase(GAMESTATE.ENDROUND.name())){
 				// At the end of the round, we reset our state and bet amounts.
 				System.out.println("Resetting player: " + this.name);
-				this.folded = false;
+				this.setFolded(false);
 				this.betAmount = 0;				
 			}
 		}
