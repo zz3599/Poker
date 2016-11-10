@@ -27,6 +27,6 @@ public class MenuState extends AbstractPokerGameState{
 
 	@Override
 	public void revealed() {
-		
+		context.engine.getFrame().getPokerPanel().removeGamePanelButtons();
 	}
 }

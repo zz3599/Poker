@@ -65,12 +65,12 @@ public class PokerPanel extends JPanel implements Observer{
 		this.add(actionPanel, BorderLayout.SOUTH);
 		
 		// Initialize menu buttons		
-		this.playMenuButton.setPreferredSize(new Dimension(this.gamePanel
-				.getPreferredSize().width, this.gamePanel
+		this.playMenuButton.setPreferredSize(new Dimension(this.actionPanel
+				.getPreferredSize().width, this.actionPanel
 				.getPreferredSize().height / 2));		
 		this.playMenuButton.addMouseListener(new GameStateButtonMouseListener(engine, GAMESTATE.STARTROUND));
-		this.exitMenuButton.setPreferredSize(new Dimension(this.gamePanel
-				.getPreferredSize().width, this.gamePanel
+		this.exitMenuButton.setPreferredSize(new Dimension(this.actionPanel
+				.getPreferredSize().width, this.actionPanel
 				.getPreferredSize().height / 2));		
 		this.exitMenuButton.addMouseListener(new GameStateButtonMouseListener(engine, GAMESTATE.EXIT));
 		
@@ -93,31 +93,34 @@ public class PokerPanel extends JPanel implements Observer{
                 RenderingHints.VALUE_ANTIALIAS_ON);
         
         GAMESTATE currentState = engine.getStateManager().getCurrentState().getGameState();
-		switch (currentState) {
-		case STARTGAME:
-			// Very beginning of the game - render some generic title stuff
-			System.out.println("Loading...");
-			this.gamePanel.removeAll();
-			this.gamePanel.add(loadingLabel, BorderLayout.CENTER);			
-			break;
-		case MENU:
-			// Play or exit buttons
-			this.gamePanel.removeAll();
-			this.gamePanel.add(playMenuButton, BorderLayout.NORTH);
-			this.gamePanel.add(exitMenuButton, BorderLayout.SOUTH);
-			break;
-		case STARTROUND:
+        if (this.actionPanel.getComponentCount() == 0){
+        	System.out.println("Adding GUI...");
+			switch (currentState) {
+			case STARTGAME:
+				// Very beginning of the game - render some generic title stuff
+				System.out.println("Loading...");
+				this.actionPanel.add(loadingLabel, BorderLayout.CENTER);			
+				break;
+			case MENU:
+				// Play or exit buttons
+				this.actionPanel.add(playMenuButton, BorderLayout.NORTH);
+				this.actionPanel.add(exitMenuButton, BorderLayout.SOUTH);
+				break;
+			case STARTROUND:		
+			case PREFLOP_BET:
+			case FLOP:
+				this.actionPanel.add(betButton);
+				this.actionPanel.add(betSlider);
+				this.actionPanel.add(checkOrCallButton);
+				this.actionPanel.add(foldButton);
+				break;
+			}
+			this.revalidate();
+        }
+	}
 	
-		case PREFLOP_BET:
-		case FLOP:
-			this.gamePanel.removeAll();
-			this.actionPanel.add(betButton);
-			this.actionPanel.add(betSlider);
-			this.actionPanel.add(checkOrCallButton);
-			this.actionPanel.add(foldButton);
-			break;
-		}
-		this.revalidate();
+	public void removeGamePanelButtons(){
+		this.actionPanel.removeAll();
 	}
 	
 	public void setUserButtonsEnabled(boolean enabled){

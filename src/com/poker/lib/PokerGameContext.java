@@ -27,7 +27,7 @@ public class PokerGameContext extends Observable {
 	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
 			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris",
 			"Ivana", "Joey" };
-	private GameEngine engine;
+	public GameEngine engine;
 	/** The user's player id */
 	public final int playerId = 0;
 	
