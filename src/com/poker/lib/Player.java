@@ -25,6 +25,7 @@ public class Player extends TablePositionSprite implements Observer {
 	/** Blinds */
 	public boolean isBB;
 	public boolean isSB;
+	public boolean isActed;
 	
 	public PokerGameContext context;
 	
@@ -72,6 +73,7 @@ public class Player extends TablePositionSprite implements Observer {
 	
 	public void bet(int amt){		
 		this.betAmount += this.addMoney(-amt);
+		this.isActed = true;
 		System.out.println(this.name + ": player::bet=" + amt + ", betAmount=" + this.betAmount + ", moneyLeft=" + this.money);
 	}	
 
@@ -95,7 +97,12 @@ public class Player extends TablePositionSprite implements Observer {
 	 * @return
 	 */
 	public boolean isActed(){
-		return this.folded || this.betAmount > 0;
+		return this.folded || this.isActed;
+	}
+	
+	public void resetIsActedBetAmount(){
+		this.isActed = false;
+		this.betAmount = 0;
 	}
 	
 	/**
