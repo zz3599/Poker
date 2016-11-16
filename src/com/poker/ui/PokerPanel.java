@@ -119,6 +119,10 @@ public class PokerPanel extends JPanel implements Observer{
         }
 	}
 	
+	/**
+	 * Removes all components from the game controls panel. This signals that on the next render, new buttons will be added
+	 * to the game panel based on the game state. 
+	 */
 	public void removeGamePanelButtons(){
 		this.actionPanel.removeAll();
 	}

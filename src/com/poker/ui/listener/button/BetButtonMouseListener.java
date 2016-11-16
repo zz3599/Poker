@@ -18,13 +18,13 @@ public class BetButtonMouseListener extends ButtonMouseListener {
 			public void update(GameEngine engine){				
 				Player userPlayer = engine.getContext().getUserPlayer();		
 				if (userPlayer.getTablePosition() == engine.getContext().getActiveTablePosition()){
-					// bet the amount
+					// bet the additional amount
 					int playerBetAmount = engine.getFrame().getPokerPanel().getPlayerBetAmount();
 					System.out.println("Invoking bet button amount=" + playerBetAmount);
-					userPlayer.betAmount = playerBetAmount;
-					engine.getContext().potSize += userPlayer.betAmount;
-					if (playerBetAmount > engine.getContext().maxBet){
-						engine.getContext().maxBet = playerBetAmount;
+					int additionalBetAmount = userPlayer.bet(playerBetAmount);					
+					engine.getContext().potSize += additionalBetAmount;
+					if (userPlayer.betAmount > engine.getContext().maxBet){
+						engine.getContext().maxBet = userPlayer.betAmount;
 					}
 					engine.getFrame().getPokerPanel().setUserButtonsEnabled(false);
 				}

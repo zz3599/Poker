@@ -68,7 +68,7 @@ public class PokerGameContext extends Observable {
 		this.occupiedSeats = new boolean[DEFAULT_GAME_SIZE];
 		this.playerMap = new LinkedHashMap<Integer, Player>();
 		this.potSize = 0;
-		this.maxBet = 0;
+		this.maxBet = -1;
 		this.blindsPolicy = new BlindsPolicy(100, 200, 100, 1);
 		this.bigBlindsSprite = new BlindsSprite(-1, true, blindsPolicy.getBigBlind());
 		this.smallBlindsSprite = new BlindsSprite(-1, false, blindsPolicy.getSmallBlind());
@@ -108,7 +108,7 @@ public class PokerGameContext extends Observable {
 		this.deck.reset();
 		this.communityCards.clear();
 		this.potSize = 0;
-		this.maxBet = 0;
+		this.maxBet = -1;
 		this.updateDealerAndBlinds();
 		this.informObservers(new GameStateObservableMessage(GAMESTATE.ENDROUND,
 				GAMESTATE.ENDROUND.name()));
@@ -175,8 +175,8 @@ public class PokerGameContext extends Observable {
 		int smallBlindIndex = smallBlindsSprite.getTablePosition();
 		int bigBlindIndex = bigBlindsSprite.getTablePosition();
 		System.out.println("Dealer index: " + dealerSprite.getTablePosition() + ",Collecting blinds from " + smallBlindIndex + "," + bigBlindIndex);
-		this.playerMap.get(smallBlindIndex).bet(blindsPolicy.getSmallBlind());
-		this.playerMap.get(bigBlindIndex).bet(blindsPolicy.getBigBlind());
+		this.playerMap.get(smallBlindIndex).setTotalBetAmount(blindsPolicy.getSmallBlind());
+		this.playerMap.get(bigBlindIndex).setTotalBetAmount(blindsPolicy.getBigBlind());
 		this.potSize += blindsPolicy.getSmallBlind() + blindsPolicy.getBigBlind();
 		// Set the max bet
 		this.maxBet = blindsPolicy.getBigBlind();
@@ -229,7 +229,7 @@ public class PokerGameContext extends Observable {
 	
 	private boolean isBettingDone(){
 		// All players must have the same amount betted in order for betting to be done.
-		if (this.maxBet <= 0){
+		if (this.maxBet < 0){
 			return false;
 		}
 		for(int i = 0; i < DEFAULT_GAME_SIZE; i++){
@@ -243,6 +243,7 @@ public class PokerGameContext extends Observable {
 				continue;
 			}
 			if(!player.isActed()){
+				System.out.println("Not acted: " + player);
 				return false;
 			}
 			int playerBet = player.betAmount;
@@ -261,9 +262,8 @@ public class PokerGameContext extends Observable {
 				continue;
 			}
 			Player player = this.playerMap.get(i);
-			player.betAmount = 0;
-		}
-		this.maxBet = this.blindsPolicy.getBigBlind();
+			player.resetIsActedBetAmount();
+		}		
 	}
 	
 	public Player getUserPlayer(){
@@ -311,9 +311,8 @@ public class PokerGameContext extends Observable {
 			if (decision == 0) {
 				// Target amount is maxBet. We need to bet maxBet-currentBet
 				// to get there.					
-				int betAmount = maxBet - currentActivePlayer.betAmount;
-				currentActivePlayer.bet(betAmount);
-				potSize += betAmount;
+				int additionalBet = currentActivePlayer.setTotalBetAmount(maxBet);
+				potSize += additionalBet;
 			} else {
 				currentActivePlayer.setFolded(true);
 			}
@@ -353,4 +352,10 @@ public class PokerGameContext extends Observable {
 			break;
 		}
 	}
+
+	public BlindsPolicy getBlindsPolicy() {
+		return blindsPolicy;
+	}
+	
+	
 }

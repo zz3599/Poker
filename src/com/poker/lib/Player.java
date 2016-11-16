@@ -71,12 +71,34 @@ public class Player extends TablePositionSprite implements Observer {
 		return betAmount;
 	}
 	
-	public void bet(int amt){		
-		this.betAmount += this.addMoney(-amt);
+	/**
+	 * Bets an additional amount.
+	 * @param amt The additional amount to bet.
+	 * @return The additional amount actually bet.
+	 */
+	public int bet(int amt){		
+		int actualBet = this.addMoney(-amt);
+		this.betAmount += actualBet;
 		this.isActed = true;
-		System.out.println(this.name + ": player::bet=" + amt + ", betAmount=" + this.betAmount + ", moneyLeft=" + this.money);
+		
+		System.out.println(this.name + ": player::bet=" + amt + ", betAmount=" + (this.betAmount) + ", moneyLeft=" + this.money);
+		return actualBet;
 	}	
 
+	/**
+	 * Sets the total bet amount of the player to the target amount.
+	 * @param totalAmount The total bet amount of the player after the call.
+	 * @return The additional bet amount by the player to reach the target amount.
+	 */
+	public int setTotalBetAmount(int totalAmount){
+		int moreBet = totalAmount - this.betAmount; 
+		if (moreBet <= 0){
+			return 0;
+		}
+		this.bet(moreBet);
+		return moreBet;
+	}
+	
 	public synchronized boolean isFolded() {
 		return folded;
 	}
