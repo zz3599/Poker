@@ -14,8 +14,9 @@ public class Card implements Comparable<Card>, IRenderable {
 	public final Suite suite;
 	public final int value;
 	public Player owner;
-	/** TODO: Change this to false eventually */
-	public boolean revealed = true;
+	/** Synchronize updates to the revealed variable, since another thread may get the wrong image url */
+	private static final Object revealedLock = new Object();
+	private Boolean revealed = true;
 
 	public Card(Suite suite, int value) {
 		assert value <= MAX_VALUE;
@@ -48,6 +49,12 @@ public class Card implements Comparable<Card>, IRenderable {
 		return (otherCard.suite == this.suite && otherCard.value == this.value);
 	}
 
+	public void setFolded(boolean isFolded){
+		synchronized (revealedLock){
+			this.revealed = !isFolded;
+		}
+	}
+	
 	@Override
 	public int compareTo(Card o) {
 		if(this.value == o.value){
@@ -58,9 +65,11 @@ public class Card implements Comparable<Card>, IRenderable {
 
 	@Override
 	public String getImageURL() {
-		if (!revealed){
-			return IMAGE_LOCATION + "default.png";
+		synchronized(revealedLock){
+			if (!revealed){
+				return IMAGE_LOCATION + "default.png";
+			}
+			return IMAGE_LOCATION + this.value + "_of_" + suite.toString().toLowerCase() + ".png";
 		}
-		return IMAGE_LOCATION + this.value + "_of_" + suite.toString().toLowerCase() + ".png";		
 	}
 }

@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -22,7 +21,6 @@ import com.poker.state.AbstractPokerGameState.GAMESTATE;
  *
  */
 public class PokerGameContext extends Observable {
-	private static final Random RANDOM = new Random();
 	public static final Integer DEFAULT_GAME_SIZE = 10;
 	public static final String[] DEFAULT_PLAYER_NAMES = new String[] { "You",
 			"Bob", "Carol", "David", "Emily", "Francis", "George", "Harris",
@@ -306,16 +304,19 @@ public class PokerGameContext extends Observable {
 				}
 				return;
 			}
-			int decision = RANDOM.nextInt(2);
-			System.out.println(currentActivePlayer.name + " deciding...");
-			if (decision == 0) {
-				// Target amount is maxBet. We need to bet maxBet-currentBet
-				// to get there.					
-				int additionalBet = currentActivePlayer.setTotalBetAmount(maxBet);
-				potSize += additionalBet;
-			} else {
+			int bet = currentActivePlayer.decide(this.maxBet);
+			if (bet < 0){
 				currentActivePlayer.setFolded(true);
+			} else {
+				// Target amount is maxBet. We need to bet maxBet-currentBet
+				// to get there.	
+				int additionalBet = currentActivePlayer.setTotalBetAmount(bet);
+				potSize += additionalBet;
+				if (bet > this.maxBet){
+					this.maxBet = bet;
+				}
 			}
+			System.out.println(currentActivePlayer.name + " decided...");
 			currentActiveTablePosition = getNextActivePlayerIndex(
 					currentActiveTablePosition, false);
 		}

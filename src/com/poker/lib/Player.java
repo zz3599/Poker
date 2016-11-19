@@ -6,6 +6,7 @@ import java.util.Observer;
 import com.poker.command.BetCommand;
 import com.poker.command.PokerCommand;
 import com.poker.hand.Hand;
+import com.poker.lib.decision.PlayerDecider;
 import com.poker.sprite.TablePositionSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
@@ -31,6 +32,8 @@ public class Player extends TablePositionSprite implements Observer {
 	
 	public PokerCommand[] pokerCommands;
 	
+	public PlayerDecider decider;
+	
 	public Player(PokerGameContext context, String name, int id, int tablePosition) {
 		this(context, name, id, tablePosition, DEFAULT_MONEY);
 	}
@@ -45,6 +48,7 @@ public class Player extends TablePositionSprite implements Observer {
 		// Will be reset to false when the round is complete.
 		this.folded = false;
 		this.context = context;
+		this.decider = new PlayerDecider(this, 0);
 		this.pokerCommands = new PokerCommand[]{new BetCommand(this, context)};
 	}
 
@@ -103,12 +107,12 @@ public class Player extends TablePositionSprite implements Observer {
 		return folded;
 	}
 
-	public synchronized void setFolded(boolean folded) {
+	public void setFolded(boolean folded) {
 		this.folded = folded;
 		// Don't reveal folded cards.
 		if (folded){
 			for(Card card : hand.getCards()){
-				card.revealed = false;
+				card.setFolded(true);
 			}
 		}
 	}
@@ -144,6 +148,15 @@ public class Player extends TablePositionSprite implements Observer {
 		return result.toString();
 	}
 
+	/**
+	 * Returns the bet amount of the player decision.
+	 * @param maxBet The current max bet on the table.
+	 * @return -1 if folding, 0 for checks (if maxBet is 0), positive for actual bet value.
+	 */
+	public int decide(int maxBet){
+		return this.decider.decide(maxBet);
+	}
+	
 	@Override
 	public int hashCode() {
 		// ensures that if x.equals(y), x.hashcode == y.hashcode

@@ -1,13 +1,16 @@
 package com.poker.lib.decision;
 
+import java.util.Random;
+
 import com.poker.hand.HandClassification;
 import com.poker.hand.HandClassifier;
 import com.poker.lib.Player;
 import com.poker.lib.PokerGameContext;
 
 public class PlayerDecider {
-	private HandClassifier handClassifier;
-	private Player player;
+	private static final Random RNG = new Random();
+	protected HandClassifier handClassifier;
+	protected Player player;
 	private int intelligence;
 	/**
 	 * 
@@ -27,6 +30,24 @@ public class PlayerDecider {
 	 * @return The amount to bet. If negative, the decision is to fold.
 	 */
 	public int decide(int maxBet){
+		if (this.intelligence == 0){
+			// Random choice
+			int randomNumber = RNG.nextInt(3);
+			switch (randomNumber) {
+			// Fold
+			case 0:
+				return -1;
+			// Call/check
+			case 1:
+				return maxBet;
+			// Raise, or just call again.	
+			case 2:
+				if(maxBet == 0){
+					return player.context.getBlindsPolicy().getBigBlind();
+				} 
+				return maxBet;
+			}			
+		}
 		HandClassification thisHand = handClassifier.getHandClassification(player.context.communityCards, player.hand);
 		int betterThanHands = 0;
 		int totalOtherHands = 0;
