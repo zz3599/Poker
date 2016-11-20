@@ -83,7 +83,7 @@ public class RenderManager {
 		if (communityCards != null) {			
 			for (int i = 0; i < communityCards.size(); i++) {
 				IRenderable communityCard = communityCards.get(i);				
-				this.render(g, communityCard, centerX + i*100, centerY, cardBoundary);				
+				this.render(g, communityCard, (int)(centerX*0.6 + i*100), centerY, cardBoundary);				
 			}
 		}
 		//Render the pot size		

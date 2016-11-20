@@ -261,6 +261,7 @@ public class PokerGameContext extends Observable {
 			}
 			Player player = this.playerMap.get(i);
 			player.resetIsActedBetAmount();
+			this.maxBet = 0;
 		}		
 	}
 	
@@ -294,7 +295,8 @@ public class PokerGameContext extends Observable {
 				if (currentActivePlayer.betAmount < maxBet){
 					// Wait on user input in this case.
 					engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money);
-					engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);				
+					engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);
+					engine.getFrame().getPokerPanel().updateCheckCallButtonText();
 					System.out.println("Waiting on user bet... current bet=" + currentActivePlayer.betAmount);
 					return;
 				} else {
@@ -309,12 +311,16 @@ public class PokerGameContext extends Observable {
 				currentActivePlayer.setFolded(true);
 			} else {
 				// Target amount is maxBet. We need to bet maxBet-currentBet
-				// to get there.	
-				int additionalBet = currentActivePlayer.setTotalBetAmount(bet);
-				potSize += additionalBet;
-				if (bet > this.maxBet){
-					this.maxBet = bet;
-				}
+				// to get there.
+				if (bet > currentActivePlayer.betAmount){
+					int additionalBet = currentActivePlayer.setTotalBetAmount(bet);
+					if (additionalBet > 0){
+						potSize += additionalBet;
+					}
+					if (bet > this.maxBet){
+						this.maxBet = bet;
+					}
+				}				
 			}
 			System.out.println(currentActivePlayer.name + " decided...");
 			currentActiveTablePosition = getNextActivePlayerIndex(

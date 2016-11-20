@@ -34,6 +34,8 @@ public class PokerPanel extends JPanel implements Observer{
 	private JPanel gamePanel;
 	private JPanel actionPanel;
 	private static final double gamePanelRatio = 0.8;
+	private static final String CHECK_STRING = "check";
+	private static final String CALL_STRING = "call";
 	private int width;
 	private int height;
 	/** Label when in start game */
@@ -47,7 +49,7 @@ public class PokerPanel extends JPanel implements Observer{
 	private JSlider betSlider = new JSlider(JSlider.HORIZONTAL);
 	private JButton checkOrCallButton = new JButton("Check");
 	private JButton foldButton = new JButton("Fold");
-	
+	private JLabel statusLabel = new JLabel("");
 	
 	public PokerPanel(GameEngine engine, int width, int height) {
 		this.width = width;
@@ -113,6 +115,7 @@ public class PokerPanel extends JPanel implements Observer{
 				this.actionPanel.add(betSlider);
 				this.actionPanel.add(checkOrCallButton);
 				this.actionPanel.add(foldButton);
+				this.actionPanel.add(statusLabel);
 				break;
 			}
 			this.revalidate();
@@ -139,7 +142,20 @@ public class PokerPanel extends JPanel implements Observer{
 		betSlider.getModel().setMinimum(0);
 		betSlider.setMajorTickSpacing(playerMoney/4);
 		betSlider.setPaintLabels(true);
-		betSlider.setPaintTicks(true);		
+		betSlider.setPaintTicks(true);
+		//betSlider.setSnapToTicks(true);
+	}
+	
+	public void setStatusString(String status){
+		this.statusLabel.setText(status);
+	}
+	
+	public void updateCheckCallButtonText(){
+		if (engine.getContext().maxBet <= 0){
+			checkOrCallButton.setText(CHECK_STRING);
+		} else {
+			checkOrCallButton.setText(CALL_STRING);
+		}
 	}
 	
 	public JPanel getGamePanel(){
