@@ -9,16 +9,22 @@ import com.poker.lib.PokerGameContext;
 
 public class PlayerDecider {
 	private static final Random RNG = new Random();
+	private static final int DEFAULT_INTELLIGENCE = 1;
+	
 	protected HandClassifier handClassifier;
 	protected Player player;
 	private int intelligence;
+	
+	public PlayerDecider(Player player){
+		this(player, DEFAULT_INTELLIGENCE);
+	}
 	/**
 	 * 
 	 * @param player
-	 * @param intelligence Something between 1-10.
+	 * @param intelligence Something between 0-10.
 	 */
 	public PlayerDecider(Player player, int intelligence){
-		assert intelligence >= 1 && intelligence <= PokerGameContext.DEFAULT_GAME_SIZE;
+		assert (intelligence >= 1 && intelligence <= PokerGameContext.DEFAULT_GAME_SIZE);
 		this.player = player;
 		this.intelligence = intelligence;
 		this.handClassifier = new HandClassifier();
@@ -66,6 +72,7 @@ public class PlayerDecider {
 			}
 		}
 		double betterThanRatio = (double)betterThanHands / totalOtherHands;
+		System.out.println("Better than ratio: " + betterThanRatio);
 		if (maxBet == 0){
 			return decideNoMaxBets(betterThanRatio);
 		} else {
@@ -85,7 +92,8 @@ public class PlayerDecider {
 	
 	private int decideMaxBets(double betterThanRatio, int currentMaxBet){
 		if (approx(betterThanRatio, 1.0)){
-			return currentMaxBet * 2;
+			// Some better models please
+			return currentMaxBet;
 		} 
 		if (approx(betterThanRatio, 0.5)){
 			return currentMaxBet;

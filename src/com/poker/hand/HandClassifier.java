@@ -51,6 +51,7 @@ public class HandClassifier {
 			return combos;
 		}
 		if (n < k || n == 0) {
+			//combos.add(cards);
 			return combos;
 		}
 		Card lastCard = cards.get(n - 1);
@@ -66,14 +67,19 @@ public class HandClassifier {
 			Hand hand) {
 		List<Card> handCards = new ArrayList<Card>(hand.getCards());
 		handCards.addAll(communityCards);
+		int handSize = DEFAULT_POKER_HAND_SIZE;
+		if (handCards.size() < DEFAULT_POKER_HAND_SIZE){
+			// We want to do comparisons on hands smaller than 5 cards as well.
+			handSize = handCards.size();
+		}
 		List<List<Card>> allFiveCardCombinations = HandClassifier.combinations(
-				handCards, DEFAULT_POKER_HAND_SIZE);
+				handCards, handSize);
 		List<HandClassification> classifications = new ArrayList<HandClassification>();
 		for (List<Card> combo : allFiveCardCombinations) {
 			HandClassification classification = getHandRank(combo);
 			// Keep at most five cards to compare against. If we have less than 5 cards in the card value (high card, 1/2 pair, trips, four of a kind) 
 			// then we need to include another few cards to get to 5.
-			if (classification.getCardValues().size() < DEFAULT_POKER_HAND_SIZE)
+			if (classification.getCardValues().size() < handSize)
 			{
 				classification.setCardKickers(ListUtils.removeAll(handCards,
 						classification.getCardValues()));
@@ -81,11 +87,11 @@ public class HandClassifier {
 
 			System.out.println(classification.getHandRank()
 					+ ", handRank: "
-					+ Long.toHexString(classification.getCardRank())					
+					+ Long.toBinaryString(classification.getCardRank())					
 					+ Arrays.deepToString(classification.getCardValues().toArray())
 					
 					+ ", kickerRank: "
-					+ Long.toHexString(classification.getKickerRank())
+					+ Long.toBinaryString(classification.getKickerRank())
 					+ Arrays.deepToString(ListUtils.removeAll(handCards,
 							classification.getCardValues()).toArray()));
 			classifications.add(classification);

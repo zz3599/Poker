@@ -306,6 +306,7 @@ public class PokerGameContext extends Observable {
 				}
 				return;
 			}
+			// Bet value is a target total bet.
 			int bet = currentActivePlayer.decide(this.maxBet);
 			if (bet < 0){
 				currentActivePlayer.setFolded(true);

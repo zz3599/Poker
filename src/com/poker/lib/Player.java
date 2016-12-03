@@ -48,7 +48,7 @@ public class Player extends TablePositionSprite implements Observer {
 		// Will be reset to false when the round is complete.
 		this.folded = false;
 		this.context = context;
-		this.decider = new PlayerDecider(this, 0);
+		this.decider = new PlayerDecider(this);
 		this.pokerCommands = new PokerCommand[]{new BetCommand(this, context)};
 	}
 
