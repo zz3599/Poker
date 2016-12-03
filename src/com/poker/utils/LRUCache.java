@@ -55,7 +55,7 @@ public class LRUCache <CACHEKEY, CACHEVALUE>{
 		return leastRecentlyUsedMap.get(key);
 	}
 	
-	public boolean contains(CACHEKEY key){
+	public synchronized boolean contains(CACHEKEY key){
 		return leastRecentlyUsedMap.containsKey(key);
 	}
 	

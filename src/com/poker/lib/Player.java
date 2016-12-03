@@ -97,6 +97,7 @@ public class Player extends TablePositionSprite implements Observer {
 	public int setTotalBetAmount(int totalAmount){
 		int moreBet = totalAmount - this.betAmount; 
 		if (moreBet <= 0){
+			this.isActed = true;
 			return 0;
 		}
 		this.bet(moreBet);
@@ -149,12 +150,24 @@ public class Player extends TablePositionSprite implements Observer {
 	}
 
 	/**
-	 * Returns the bet amount of the player decision.
+	 * Returns the bet amount of the player decision. The player will be bet the amount the underlying
+	 * decider decides.
 	 * @param maxBet The current max bet on the table.
 	 * @return -1 if folding, 0 for checks (if maxBet is 0), positive for actual bet value.
 	 */
 	public int decide(int maxBet){
-		return this.decider.decide(maxBet);
+		int userDecision = this.decider.decide(maxBet);
+		// Cap bet at user's current money (ALL IN)
+		if (userDecision > this.money){
+			return this.bet(this.money);
+		} 
+		// If fold, set player to folded
+		if (userDecision < 0){
+			this.setFolded(true);
+		} else {
+			this.setTotalBetAmount(userDecision);
+		}		
+		return userDecision; 
 	}
 	
 	@Override

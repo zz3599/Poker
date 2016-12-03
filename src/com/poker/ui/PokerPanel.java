@@ -137,12 +137,13 @@ public class PokerPanel extends JPanel implements Observer{
 		betSlider.setEnabled(enabled);
 	}
 	
-	public void updateSliderModel(int playerMoney){
+	public void updateSliderModel(int playerMoney, int currentCallBet){
 		betSlider.getModel().setMaximum(playerMoney);
 		betSlider.getModel().setMinimum(0);
 		betSlider.setMajorTickSpacing(playerMoney/4);
 		betSlider.setPaintLabels(true);
 		betSlider.setPaintTicks(true);
+		betSlider.setValue(currentCallBet);
 		//betSlider.setSnapToTicks(true);
 	}
 	

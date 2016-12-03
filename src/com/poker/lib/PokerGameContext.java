@@ -245,7 +245,7 @@ public class PokerGameContext extends Observable {
 				return false;
 			}
 			int playerBet = player.betAmount;
-			if (playerBet < this.maxBet){
+			if (playerBet < this.maxBet && player.money > 0){
 				System.out.println("Player " + player.name + " bet amount: " + playerBet + ", maxBet: " + maxBet);
 				return false;
 			}					
@@ -292,11 +292,11 @@ public class PokerGameContext extends Observable {
 			Player currentActivePlayer = playerMap
 					.get(currentActiveTablePosition);
 			if (currentActivePlayer.id == this.playerId){
-				if (currentActivePlayer.betAmount < maxBet){
+				engine.getFrame().getPokerPanel().updateCheckCallButtonText();
+				if (!currentActivePlayer.isActed()){
 					// Wait on user input in this case.
-					engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money);
+					engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money, this.maxBet);
 					engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);
-					engine.getFrame().getPokerPanel().updateCheckCallButtonText();
 					System.out.println("Waiting on user bet... current bet=" + currentActivePlayer.betAmount);
 					return;
 				} else {
@@ -308,25 +308,16 @@ public class PokerGameContext extends Observable {
 			}
 			// Bet value is a target total bet.
 			int bet = currentActivePlayer.decide(this.maxBet);
-			if (bet < 0){
-				currentActivePlayer.setFolded(true);
-			} else {
-				// Target amount is maxBet. We need to bet maxBet-currentBet
-				// to get there.
-				if (bet > currentActivePlayer.betAmount){
-					int additionalBet = currentActivePlayer.setTotalBetAmount(bet);
-					if (additionalBet > 0){
-						potSize += additionalBet;
-					}
-					if (bet > this.maxBet){
-						this.maxBet = bet;
-					}
-				}				
-			}
-			System.out.println(currentActivePlayer.name + " decided...");
+			// Ensure we add the pot amount and update the current round max bet,
+			// even if it's 0.
+			if (bet >= 0 && bet >= this.maxBet){
+				this.maxBet = bet;
+				potSize += bet;
+			} 
+			System.out.println(currentActivePlayer.name + " decided...bet=" + bet + ",potSize=" + potSize);
 			currentActiveTablePosition = getNextActivePlayerIndex(
 					currentActiveTablePosition, false);
-		}
+		}	
 	}
 	
 	/**

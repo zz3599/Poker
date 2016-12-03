@@ -18,7 +18,7 @@ public class CheckOrCallButtonMouseListener extends ButtonMouseListener{
 			public void update(GameEngine engine){				
 				Player userPlayer = engine.getContext().getUserPlayer();
 				userPlayer.setFolded(false);
-				if (userPlayer.betAmount < engine.getContext().maxBet){
+				if (userPlayer.betAmount <= engine.getContext().maxBet){
 					// this is a call
 					engine.getContext().potSize += engine.getContext().maxBet - userPlayer.betAmount;
 					userPlayer.setTotalBetAmount(engine.getContext().maxBet);			
