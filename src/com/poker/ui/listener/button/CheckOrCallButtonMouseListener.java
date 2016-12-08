@@ -6,6 +6,7 @@ import com.poker.lib.GameEngine;
 import com.poker.lib.Player;
 import com.poker.lib.message.ObservableMessage;
 
+// Or bet...
 public class CheckOrCallButtonMouseListener extends ButtonMouseListener{
 
 	public CheckOrCallButtonMouseListener(GameEngine engine) {
@@ -17,16 +18,16 @@ public class CheckOrCallButtonMouseListener extends ButtonMouseListener{
 		engine.getEventQueue().queue(new ObservableMessage(getClass().getName()){
 			public void update(GameEngine engine){				
 				Player userPlayer = engine.getContext().getUserPlayer();
-				userPlayer.setFolded(false);
-				if (userPlayer.betAmount <= engine.getContext().maxBet){
-					// this is a call
-					engine.getContext().potSize += engine.getContext().maxBet - userPlayer.betAmount;
-					userPlayer.setTotalBetAmount(engine.getContext().maxBet);			
-					System.out.println(userPlayer + " called...setting to " + userPlayer.betAmount);					
-					return;
+				int betAmount = engine.getFrame().getPokerPanel().getPlayerBetAmount();				
+				int additionalBet = userPlayer.bet(betAmount);
+				engine.getContext().potSize += additionalBet;
+				// this is a call/check				
+				if (userPlayer.betAmount == engine.getContext().maxBet){					
+					System.out.println(userPlayer + " called...totalBet=" + userPlayer.betAmount + ", additional bet=" + additionalBet);					
+				} else {
+					engine.getContext().maxBet = userPlayer.betAmount;
+					System.out.println(userPlayer + " raised...maxBet=totalBet=" + userPlayer.betAmount);
 				}
-				// if checking, nothing should happen
-				System.out.println(userPlayer + " checked");
 			}
 		});		
 	}

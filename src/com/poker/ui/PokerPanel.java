@@ -3,9 +3,9 @@ package com.poker.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.RenderingHints;
 import java.util.Observable;
 import java.util.Observer;
@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 import com.poker.lib.GameEngine;
-import com.poker.state.AbstractPokerGameState;
+import com.poker.lib.Player;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 import com.poker.ui.listener.button.BetButtonMouseListener;
 import com.poker.ui.listener.button.CheckOrCallButtonMouseListener;
@@ -50,6 +50,8 @@ public class PokerPanel extends JPanel implements Observer{
 	private JButton checkOrCallButton = new JButton("Check");
 	private JButton foldButton = new JButton("Fold");
 	private JLabel statusLabel = new JLabel("");
+	/** If we get repeated updates with this particular value, only process the first and ignore the rest */	
+	private int previousPlayerMoney = 0;
 	
 	public PokerPanel(GameEngine engine, int width, int height) {
 		this.width = width;
@@ -60,7 +62,7 @@ public class PokerPanel extends JPanel implements Observer{
 		this.gamePanel = new GamePanel(new BorderLayout(), engine);
 		this.gamePanel.setPreferredSize(new Dimension(width,
 				(int) (gamePanelRatio * height)));
-		this.actionPanel = new JPanel(new FlowLayout());
+		this.actionPanel = new JPanel(new GridLayout(1, 5));
 		this.actionPanel.setPreferredSize(new Dimension( (width),
 				(int) ((1.0 - gamePanelRatio) * height)));
 		this.add(gamePanel, BorderLayout.NORTH);
@@ -137,13 +139,19 @@ public class PokerPanel extends JPanel implements Observer{
 		betSlider.setEnabled(enabled);
 	}
 	
-	public void updateSliderModel(int playerMoney, int currentCallBet){
-		betSlider.getModel().setMaximum(playerMoney);
-		betSlider.getModel().setMinimum(0);
-		betSlider.setMajorTickSpacing(playerMoney/4);
+	public void updateSliderModel(Player player, int currentCallBet){
+		// Stop updating if it's the same event.
+		if (this.previousPlayerMoney == player.money){
+			System.out.println("Same bet, no update");
+			return;
+		}
+		this.previousPlayerMoney = player.money;
+		betSlider.getModel().setMaximum(player.money);
+		betSlider.getModel().setMinimum(currentCallBet);
+		betSlider.setMajorTickSpacing(player.money/4);
 		betSlider.setPaintLabels(true);
 		betSlider.setPaintTicks(true);
-		betSlider.setValue(currentCallBet);
+		betSlider.setValue(player.betAmount);
 		//betSlider.setSnapToTicks(true);
 	}
 	

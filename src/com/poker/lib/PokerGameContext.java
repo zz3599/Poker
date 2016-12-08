@@ -295,7 +295,7 @@ public class PokerGameContext extends Observable {
 				engine.getFrame().getPokerPanel().updateCheckCallButtonText();
 				if (!currentActivePlayer.isActed()){
 					// Wait on user input in this case.
-					engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer.money, this.maxBet);
+					engine.getFrame().getPokerPanel().updateSliderModel(currentActivePlayer, this.maxBet);
 					engine.getFrame().getPokerPanel().setUserButtonsEnabled(true);
 					System.out.println("Waiting on user bet... current bet=" + currentActivePlayer.betAmount);
 					return;
@@ -310,10 +310,12 @@ public class PokerGameContext extends Observable {
 			int bet = currentActivePlayer.decide(this.maxBet);
 			// Ensure we add the pot amount and update the current round max bet,
 			// even if it's 0.
-			if (bet >= 0 && bet >= this.maxBet){
-				this.maxBet = bet;
+			if (bet >= 0){
 				potSize += bet;
-			} 
+			}
+			if (currentActivePlayer.betAmount > this.maxBet){
+				this.maxBet = bet;
+			}
 			System.out.println(currentActivePlayer.name + " decided...bet=" + bet + ",potSize=" + potSize);
 			currentActiveTablePosition = getNextActivePlayerIndex(
 					currentActiveTablePosition, false);

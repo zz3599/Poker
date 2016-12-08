@@ -18,7 +18,7 @@ public class Player extends TablePositionSprite implements Observer {
 	public String name;
 	public Hand hand;
 	public int money;
-	/** Have a betAmount, also can be folded */
+	/** The bet amount of the current betting turn - not the entire round*/
 	public int betAmount;
 	public boolean folded;
 	/** By default false */
@@ -88,7 +88,7 @@ public class Player extends TablePositionSprite implements Observer {
 		System.out.println(this.name + ": player::bet=" + amt + ", betAmount=" + (this.betAmount) + ", moneyLeft=" + this.money);
 		return actualBet;
 	}	
-
+	
 	/**
 	 * Sets the total bet amount of the player to the target amount.
 	 * @param totalAmount The total bet amount of the player after the call.
@@ -153,7 +153,7 @@ public class Player extends TablePositionSprite implements Observer {
 	 * Returns the bet amount of the player decision. The player will be bet the amount the underlying
 	 * decider decides.
 	 * @param maxBet The current max bet on the table.
-	 * @return -1 if folding, 0 for checks (if maxBet is 0), positive for actual bet value.
+	 * @return The actual amount bet.
 	 */
 	public int decide(int maxBet){
 		int userDecision = this.decider.decide(maxBet);
@@ -164,10 +164,10 @@ public class Player extends TablePositionSprite implements Observer {
 		// If fold, set player to folded
 		if (userDecision < 0){
 			this.setFolded(true);
+			return 0;
 		} else {
-			this.setTotalBetAmount(userDecision);
+			return this.setTotalBetAmount(userDecision);
 		}		
-		return userDecision; 
 	}
 	
 	@Override
