@@ -10,10 +10,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import com.poker.exception.PokerException;
+import com.poker.hand.HandClassification;
+import com.poker.hand.HandClassifier;
 import com.poker.lib.message.AsyncDispatcher;
 import com.poker.lib.message.GameStateObservableMessage;
 import com.poker.sprite.BlindsSprite;
 import com.poker.sprite.DealerSprite;
+import com.poker.state.EndRoundState;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
 
 /**
@@ -35,6 +38,8 @@ public class PokerGameContext extends Observable {
 	/** current max bet is the amount other players have to minimally call in order to continue playing */
 	public int maxBet;
 	public final Deck deck;
+	public HandClassifier handClassifier;
+	
 	/** Seat index -> player */
 	public final Map<Integer, Player> playerMap;
 	/** Map to determine if the seats are occupied */
@@ -62,6 +67,7 @@ public class PokerGameContext extends Observable {
 	
 	public PokerGameContext() {
 		this.deck = new Deck();
+		this.handClassifier = new HandClassifier();
 		this.communityCards = new ArrayList<Card>();
 		this.occupiedSeats = new boolean[DEFAULT_GAME_SIZE];
 		this.playerMap = new LinkedHashMap<Integer, Player>();
@@ -73,7 +79,7 @@ public class PokerGameContext extends Observable {
 		// Player id != table position key in playerMap
 		for(int i = 0; i < DEFAULT_PLAYER_NAMES.length; i++){
 			// i is the table position.
-			Player newPlayer = new Player(this, DEFAULT_PLAYER_NAMES[i], Player.PLAYER_ID++, i);
+			Player newPlayer = new Player(this, DEFAULT_PLAYER_NAMES[i], Player.PLAYER_ID++, i, handClassifier);
 			this.addPlayer(newPlayer);
 			// The players will reset when the round is ended.
 			this.addObserver(newPlayer);
@@ -99,18 +105,38 @@ public class PokerGameContext extends Observable {
 		this.deal();		
 	}
 	
-	public void endRound() {
-		for (Player player : playerMap.values()) {
-			player.removeHand();
-		}
-		this.deck.reset();
-		this.communityCards.clear();
-		this.potSize = 0;
-		this.maxBet = -1;
-		this.updateDealerAndBlinds();
+	public void endRound() {		
+		System.out.println("Ending round...");
+		Player winningPlayer = this.getWinningPlayer();
+		winningPlayer.money += this.potSize;
+		System.out.println("Winning player: " + winningPlayer);
 		this.informObservers(new GameStateObservableMessage(GAMESTATE.ENDROUND,
 				GAMESTATE.ENDROUND.name()));
-		//TODO: give the money to somebody
+	}
+	
+	private Player getWinningPlayer(){
+		Player winningPlayer = null;
+		for(int i = 0; i < DEFAULT_GAME_SIZE; i++){
+			Player player = this.playerMap.get(i);
+			if(player == null){
+				// Skip if there is no player at the seat.
+				continue;
+			}			
+			// Ignore folded players.
+			if(!player.isActive()){
+				continue;
+			}
+			if (winningPlayer == null){
+				winningPlayer = player;
+			} else {
+				HandClassification playerClass = handClassifier.getHandClassification(this.communityCards, player.hand);
+				HandClassification winningClass = handClassifier.getHandClassification(this.communityCards, winningPlayer.hand);
+				if(playerClass.compareTo(winningClass) > 0){
+					winningPlayer = player;
+				}
+			}
+		}
+		return winningPlayer;
 	}
 	
 	private void updateDealerAndBlinds(){
@@ -265,6 +291,20 @@ public class PokerGameContext extends Observable {
 		}		
 	}
 	
+	private int getNumPlayersActive(){
+		int activePlayers = 0;
+		for(int i = 0; i < DEFAULT_GAME_SIZE; i++){
+			if(this.playerMap.get(i) == null){
+				// Skip if there is no player at the seat.
+				continue;
+			}
+			Player player = this.playerMap.get(i);
+			if (player.isActive()){
+				activePlayers++;
+			}
+		}
+		return activePlayers;
+	}
 	public Player getUserPlayer(){
 		return this.playerMap.get(0);
 	}
@@ -287,7 +327,12 @@ public class PokerGameContext extends Observable {
 		if (isBettingDone()) {
 			this.resetBets();
 			engine.getFrame().getPokerPanel().setUserButtonsEnabled(false);
-			engine.getStateManager().advanceState(targetStateWhenCompleted);
+			// We need to end the round immediately if there is only one player left.
+			if (this.getNumPlayersActive() == 1){
+				engine.getStateManager().advanceState(GAMESTATE.ENDROUND);
+			} else {
+				engine.getStateManager().advanceState(targetStateWhenCompleted);	
+			}			
 		} else {
 			Player currentActivePlayer = playerMap
 					.get(currentActiveTablePosition);
@@ -349,6 +394,24 @@ public class PokerGameContext extends Observable {
 		case POSTRIVER_BET:
 			this.betRound(GAMESTATE.ENDROUND);
 			break;
+		case ENDROUND:
+			EndRoundState endRoundState = (EndRoundState) engine.getStateManager().getCurrentState();
+			endRoundState.incrementFrames();
+			if (endRoundState.shouldAdvanceState()){
+				//Cleanup for the round, before advancing to the next round.
+				for (Player player : playerMap.values()) {
+					player.removeHand();
+				}
+				this.deck.reset();
+				this.communityCards.clear();
+				
+				this.maxBet = -1;
+				this.updateDealerAndBlinds();
+				engine.getStateManager().advanceState(GAMESTATE.STARTROUND);	
+			} else {
+				System.out.println("Waiting for ENDROUND to finish...");
+			}
+			
 		default:
 			break;
 		}

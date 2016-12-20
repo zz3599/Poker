@@ -31,6 +31,7 @@ public class BlindsPolicy implements Observer {
 		if (arg instanceof GameStateObservableMessage
 				&& ((GameStateObservableMessage) arg).getTargetState() == GAMESTATE.ENDROUND) {
 			rounds++;
+			System.out.println("Blindspolicy::update() received ENDROUND event, # rounds: " + rounds + ", roundsBeforeIncrementBlinds: " + roundsBeforeIncrement);
 			if (rounds % roundsBeforeIncrement == 0) {
 				smallBlind += increment;
 				bigBlind += increment;

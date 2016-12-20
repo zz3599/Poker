@@ -15,19 +15,19 @@ public class PlayerDecider {
 	protected Player player;
 	private int intelligence;
 	
-	public PlayerDecider(Player player){
-		this(player, DEFAULT_INTELLIGENCE);
+	public PlayerDecider(Player player, HandClassifier classifier){
+		this(player, DEFAULT_INTELLIGENCE, classifier);
 	}
 	/**
 	 * 
 	 * @param player
 	 * @param intelligence Something between 0-10.
 	 */
-	public PlayerDecider(Player player, int intelligence){
+	public PlayerDecider(Player player, int intelligence, HandClassifier classifier){
 		assert (intelligence >= 1 && intelligence <= PokerGameContext.DEFAULT_GAME_SIZE);
 		this.player = player;
 		this.intelligence = intelligence;
-		this.handClassifier = new HandClassifier();
+		this.handClassifier = classifier;
 	}
 	
 	/**

@@ -85,15 +85,15 @@ public class HandClassifier {
 						classification.getCardValues()));
 			}
 
-			System.out.println(classification.getHandRank()
-					+ ", handRank: "
-					+ Long.toBinaryString(classification.getCardRank())					
-					+ Arrays.deepToString(classification.getCardValues().toArray())
-					
-					+ ", kickerRank: "
-					+ Long.toBinaryString(classification.getKickerRank())
-					+ Arrays.deepToString(ListUtils.removeAll(handCards,
-							classification.getCardValues()).toArray()));
+//			System.out.println(classification.getHandRank()
+//					+ ", handRank: "
+//					+ Long.toBinaryString(classification.getCardRank())					
+//					+ Arrays.deepToString(classification.getCardValues().toArray())
+//					
+//					+ ", kickerRank: "
+//					+ Long.toBinaryString(classification.getKickerRank())
+//					+ Arrays.deepToString(ListUtils.removeAll(handCards,
+//							classification.getCardValues()).toArray()));
 			classifications.add(classification);
 		}
 		Collections.sort(classifications);

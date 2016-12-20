@@ -6,6 +6,7 @@ import java.util.Observer;
 import com.poker.command.BetCommand;
 import com.poker.command.PokerCommand;
 import com.poker.hand.Hand;
+import com.poker.hand.HandClassifier;
 import com.poker.lib.decision.PlayerDecider;
 import com.poker.sprite.TablePositionSprite;
 import com.poker.state.AbstractPokerGameState.GAMESTATE;
@@ -13,7 +14,7 @@ import com.poker.state.AbstractPokerGameState.GAMESTATE;
 public class Player extends TablePositionSprite implements Observer {
 	private static final String IMAGE_LOCATION = "res/board/";
 	public static int PLAYER_ID = 0;
-	public static final int DEFAULT_MONEY = 1000;
+	public static final int DEFAULT_MONEY = 2000;
 	public int id;
 	public String name;
 	public Hand hand;
@@ -34,11 +35,11 @@ public class Player extends TablePositionSprite implements Observer {
 	
 	public PlayerDecider decider;
 	
-	public Player(PokerGameContext context, String name, int id, int tablePosition) {
-		this(context, name, id, tablePosition, DEFAULT_MONEY);
+	public Player(PokerGameContext context, String name, int id, int tablePosition, HandClassifier handClassifier) {
+		this(context, name, id, tablePosition, DEFAULT_MONEY, handClassifier);
 	}
 
-	private Player(PokerGameContext context, String name, int id, int tablePosition, int money) {
+	private Player(PokerGameContext context, String name, int id, int tablePosition, int money, HandClassifier handClassifier) {
 		super(tablePosition);
 		this.name = name;
 		this.id = id;
@@ -48,7 +49,7 @@ public class Player extends TablePositionSprite implements Observer {
 		// Will be reset to false when the round is complete.
 		this.folded = false;
 		this.context = context;
-		this.decider = new PlayerDecider(this);
+		this.decider = new PlayerDecider(this, handClassifier);
 		this.pokerCommands = new PokerCommand[]{new BetCommand(this, context)};
 	}
 
